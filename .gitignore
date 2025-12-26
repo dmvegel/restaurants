@@ -3,9 +3,9 @@ HELP.md
 
 ### IntelliJ IDEA ###
 .idea/
-*.iws
+out
+target
 *.iml
-*.ipr
 *.patch
 *.*~
 log
