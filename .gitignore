@@ -9,3 +9,6 @@ target
 *.patch
 *.*~
 log
+mvnw
+mvnw.cmd
+.mvn/
