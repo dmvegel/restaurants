@@ -1,0 +1,34 @@
+package ru.javaops.bootjava.restaurant.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.javaops.bootjava.common.model.BaseEntity;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "menu", uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "restaurant_id"}, name = "uk_date_restaurant_id")})
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Menu extends BaseEntity {
+    @Column(name = "date", nullable = false)
+    @NotNull
+    private LocalDate date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id")
+    @NotNull
+    private Restaurant restaurant;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @Size(min = 2, max = 5)
+    private List<Dish> dishes = new ArrayList<>();
+}
