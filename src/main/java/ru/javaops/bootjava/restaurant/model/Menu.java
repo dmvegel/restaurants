@@ -29,6 +29,6 @@ public class Menu extends BaseEntity {
     private Restaurant restaurant;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @Size(min = 2, max = 5)
+    @Size(min = 1)
     private List<Dish> dishes = new ArrayList<>();
 }
