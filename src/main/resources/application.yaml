@@ -46,4 +46,4 @@ spring:
     ru.javaops.bootjava: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: DEBUG
 
-#springdoc.swagger-ui.path: /
+springdoc.swagger-ui.path: /

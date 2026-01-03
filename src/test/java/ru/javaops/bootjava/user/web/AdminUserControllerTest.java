@@ -7,12 +7,14 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javaops.bootjava.AbstractControllerTest;
+import ru.javaops.bootjava.common.error.NotFoundException;
 import ru.javaops.bootjava.user.model.Role;
 import ru.javaops.bootjava.user.model.User;
-import ru.javaops.bootjava.user.repository.UserRepository;
+import ru.javaops.bootjava.user.service.UserService;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,7 +27,7 @@ class AdminUserControllerTest extends AbstractControllerTest {
     private static final String REST_URL_SLASH = REST_URL + '/';
 
     @Autowired
-    private UserRepository repository;
+    private UserService userService;
 
     @Test
     @WithUserDetails(value = ADMIN_MAIL)
@@ -61,7 +63,8 @@ class AdminUserControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.delete(REST_URL_SLASH + USER_ID))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        assertFalse(repository.findByEmailIgnoreCase(USER_MAIL).isPresent());
+//        assertNotNull(userService.get(USER_MAIL));
+        assertThrows(NotFoundException.class, () -> userService.get(USER_MAIL));
     }
 
     @Test
@@ -107,7 +110,7 @@ class AdminUserControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        USER_MATCHER.assertMatch(repository.getExisted(USER_ID), getUpdated());
+        USER_MATCHER.assertMatch(userService.get(USER_ID), getUpdated());
     }
 
     @Test
@@ -124,7 +127,7 @@ class AdminUserControllerTest extends AbstractControllerTest {
                 .content(jsonWithPassword(updated, "newPass")))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        USER_MATCHER.assertMatch(repository.getExisted(USER_ID), updated);
+        USER_MATCHER.assertMatch(userService.get(USER_ID), updated);
 
         perform(MockMvcRequestBuilders.get(ProfileController.REST_URL)
                 .with(userHttpBasic(user)))
@@ -144,7 +147,7 @@ class AdminUserControllerTest extends AbstractControllerTest {
         int newId = created.id();
         newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
-        USER_MATCHER.assertMatch(repository.getExisted(newId), newUser);
+        USER_MATCHER.assertMatch(userService.get(newId), newUser);
     }
 
     @Test
@@ -165,7 +168,7 @@ class AdminUserControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        assertFalse(repository.getExisted(USER_ID).isEnabled());
+        assertFalse(userService.get(USER_ID).isEnabled());
     }
 
     @Test

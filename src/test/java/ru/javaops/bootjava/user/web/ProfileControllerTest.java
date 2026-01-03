@@ -10,7 +10,7 @@ import ru.javaops.bootjava.AbstractControllerTest;
 import ru.javaops.bootjava.common.util.JsonUtil;
 import ru.javaops.bootjava.user.UsersUtil;
 import ru.javaops.bootjava.user.model.User;
-import ru.javaops.bootjava.user.repository.UserRepository;
+import ru.javaops.bootjava.user.service.UserService;
 import ru.javaops.bootjava.user.to.UserTo;
 
 import static org.hamcrest.Matchers.containsString;
@@ -23,7 +23,7 @@ import static ru.javaops.bootjava.user.web.ProfileController.REST_URL;
 class ProfileControllerTest extends AbstractControllerTest {
 
     @Autowired
-    private UserRepository repository;
+    private UserService userService;
 
     @Test
     @WithUserDetails(value = USER_MAIL)
@@ -45,7 +45,7 @@ class ProfileControllerTest extends AbstractControllerTest {
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL))
                 .andExpect(status().isNoContent());
-        USER_MATCHER.assertMatch(repository.findAll(), admin, guest);
+        USER_MATCHER.assertMatch(userService.getAll(), admin, guest);
     }
 
     @Test
@@ -62,7 +62,7 @@ class ProfileControllerTest extends AbstractControllerTest {
         int newId = created.id();
         newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
-        USER_MATCHER.assertMatch(repository.getExisted(newId), newUser);
+        USER_MATCHER.assertMatch(userService.get(newId), newUser);
     }
 
     @Test
@@ -74,7 +74,7 @@ class ProfileControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        USER_MATCHER.assertMatch(repository.getExisted(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
+        USER_MATCHER.assertMatch(userService.get(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
     }
 
     @Test
@@ -99,7 +99,7 @@ class ProfileControllerTest extends AbstractControllerTest {
                 .content(JsonUtil.writeValue(updatedTo)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        USER_MATCHER.assertMatch(repository.getExisted(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
+        USER_MATCHER.assertMatch(userService.get(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
 
         perform(MockMvcRequestBuilders.get(REST_URL)
                 .with(userHttpBasic(user)))
