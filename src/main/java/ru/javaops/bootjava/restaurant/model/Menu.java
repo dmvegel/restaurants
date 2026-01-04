@@ -1,5 +1,6 @@
 package ru.javaops.bootjava.restaurant.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,8 +11,8 @@ import lombok.Setter;
 import ru.javaops.bootjava.common.model.BaseEntity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "menu", uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "restaurant_id"}, name = "uk_date_restaurant_id")})
@@ -26,9 +27,10 @@ public class Menu extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     @NotNull
+    @JsonIgnore
     private Restaurant restaurant;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @Size(min = 1)
-    private List<Dish> dishes = new ArrayList<>();
+    private Set<Dish> dishes = new HashSet<>();
 }

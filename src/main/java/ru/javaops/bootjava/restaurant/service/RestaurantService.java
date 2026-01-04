@@ -27,12 +27,12 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
     }
 
     public Restaurant getWithMenus(int id) {
-        return repository.getRestaurantWithAllMenus(id).orElseThrow(
+        return repository.getRestaurantWithAllMenusAndDishes(id).orElseThrow(
                 () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
     }
 
     public Restaurant getWithMenu(int id, LocalDate date) {
-        return repository.getRestaurantWithMenu(id, date).orElseThrow(
+        return repository.getRestaurantWithMenuAndDishes(id, date).orElseThrow(
                 () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
     }
 

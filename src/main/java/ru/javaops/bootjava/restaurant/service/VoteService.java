@@ -14,9 +14,11 @@ import java.time.LocalTime;
 @Service
 public class VoteService extends BaseService<Vote, VoteRepository> {
     private static final LocalTime CHANGE_DEADLINE = LocalTime.of(11, 0);
+    private final RestaurantService restaurantService;
 
-    public VoteService(VoteRepository repository) {
+    public VoteService(VoteRepository repository, RestaurantService restaurantService) {
         super(repository);
+        this.restaurantService = restaurantService;
     }
 
     public long countVotes(int restaurantId, LocalDate date) {
@@ -24,8 +26,10 @@ public class VoteService extends BaseService<Vote, VoteRepository> {
     }
 
     @Transactional
-    public Vote save(User user, Restaurant restaurant, LocalDate date) {
-        return repository.findByUserIdAndDate(user.getId(), date)
+    public Vote save(User user, int restaurantId) {
+        Restaurant restaurant = restaurantService.get(restaurantId);
+        LocalDate currentDate = LocalDate.now();
+        return repository.findByUserIdAndDate(user.getId(), currentDate)
                 .map(existingVote -> {
                     if (!LocalTime.now().isBefore(CHANGE_DEADLINE)) {
                         throw new IllegalStateException("Cannot change vote after " + CHANGE_DEADLINE);
@@ -33,7 +37,7 @@ public class VoteService extends BaseService<Vote, VoteRepository> {
                     existingVote.setRestaurant(restaurant);
                     return existingVote;
                 })
-                .orElseGet(() -> repository.save(new Vote(user, restaurant, date)));
+                .orElseGet(() -> repository.save(new Vote(user, restaurant, currentDate)));
     }
 
 }

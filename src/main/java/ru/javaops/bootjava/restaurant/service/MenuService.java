@@ -35,17 +35,20 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
 
     @Transactional
     public Menu save(Menu menu, int restaurantId) {
+        Restaurant restaurant = restaurantService.get(restaurantId);
+        menu.setRestaurant(restaurant);
         if (menu.isNew()) {
-            Restaurant restaurant = restaurantService.get(restaurantId);
-            menu.setRestaurant(restaurant);
             return repository.save(menu);
         }
-        Menu saved = getExisted(menu.getId());
+        Menu saved = get(restaurantId, menu.getDate());
         saved.setDishes(menu.getDishes());
+        saved.setDate(menu.getDate());
         return saved;
     }
 
-    public void delete(int id) {
-        deleteExisted(id);
+    @Transactional
+    public void delete(int restaurantId, LocalDate date) {
+        Menu menu = get(restaurantId, date);
+        repository.delete(menu);
     }
 }
