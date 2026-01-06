@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javaops.bootjava.app.config.WebConfig;
 import ru.javaops.bootjava.restaurant.model.Restaurant;
 import ru.javaops.bootjava.restaurant.service.RestaurantService;
+import ru.javaops.bootjava.restaurant.to.RestaurantTO;
 
 import java.net.URI;
 
@@ -25,28 +26,22 @@ public class AdminRestaurantController {
     static final String REST_URL = "/api/admin/restaurants";
     private final RestaurantService restaurantService;
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable int id) {
-        restaurantService.delete(id);
-    }
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Restaurant> create(@Valid @RequestBody Restaurant restaurant) {
-        log.info("create {}", restaurant);
-        checkNew(restaurant);
-        Restaurant created = restaurantService.save(restaurant);
+    public ResponseEntity<Restaurant> create(@Valid @RequestBody RestaurantTO restaurantTo) {
+        log.info("create {}", restaurantTo);
+        checkNew(restaurantTo);
+        Restaurant created = restaurantService.create(restaurantTo);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL + "/{id}")
+                .path(RestaurantController.REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
-        log.info("update {} with id={}", restaurant, id);
-        assureIdConsistent(restaurant, id);
-        restaurantService.save(restaurant);
+    public void update(@Valid @RequestBody RestaurantTO restaurantTo, @PathVariable int id) {
+        log.info("update {} with id={}", restaurantTo, id);
+        assureIdConsistent(restaurantTo, id);
+        restaurantService.update(restaurantTo);
     }
 }

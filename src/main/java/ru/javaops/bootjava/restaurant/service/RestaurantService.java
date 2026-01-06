@@ -1,13 +1,16 @@
 package ru.javaops.bootjava.restaurant.service;
 
-import org.springframework.data.domain.Sort;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.javaops.bootjava.common.error.NotFoundException;
 import ru.javaops.bootjava.common.service.BaseService;
 import ru.javaops.bootjava.restaurant.model.Restaurant;
 import ru.javaops.bootjava.restaurant.repository.RestaurantRepository;
+import ru.javaops.bootjava.restaurant.to.RestaurantTO;
+import ru.javaops.bootjava.restaurant.to.RestaurantWithMenuTO;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -18,29 +21,46 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
         super(repository);
     }
 
-    public List<Restaurant> getAll() {
-        return repository.findAll(Sort.by(Sort.Direction.ASC, "name"));
+    public List<RestaurantWithMenuTO> getAllWithMenus(LocalDate date) {
+        return repository.getRestaurantsWithMenusByDate(date)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(RestaurantWithMenuTO::new)
+                .toList();
     }
 
-    public Restaurant get(int id) {
-        return getExisted(id);
+    public RestaurantTO get(int id) {
+        return new RestaurantTO(getExisted(id));
     }
 
-    public Restaurant getWithMenus(int id) {
-        return repository.getRestaurantWithAllMenusAndDishes(id).orElseThrow(
-                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
+    public Restaurant getReference(int id) {
+        return repository.getReferenceById(id);
     }
 
-    public Restaurant getWithMenu(int id, LocalDate date) {
-        return repository.getRestaurantWithMenuAndDishes(id, date).orElseThrow(
-                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
+    public List<RestaurantTO> getAll() {
+        return repository.findAll().stream().map(RestaurantTO::new).toList();
     }
 
-    public Restaurant save(Restaurant restaurant) {
-        return repository.save(restaurant);
+//    public Restaurant getWithMenus(int id) {
+//        return repository.getRestaurantWithAllMenus(id).orElseThrow(
+//                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
+//    }
+
+    public RestaurantWithMenuTO getWithMenu(int id, LocalDate date) {
+        return repository.getRestaurantWithMenu(id, date).map(RestaurantWithMenuTO::new).orElseThrow(
+                () -> new NotFoundException("Menu with restaurantId=" + id + " for date=" + date + " not found"));
     }
 
-    public void delete(int id) {
-        deleteExisted(id);
+    @Transactional
+    public Restaurant create(RestaurantTO restaurantTo) {
+        return repository.save(new Restaurant(restaurantTo));
+    }
+
+    @Transactional
+    public Restaurant update(RestaurantTO restaurantTo) {
+        Restaurant restaurant = repository.findById(restaurantTo.getId()).orElseThrow(
+                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, restaurantTo.getId())));
+        restaurant.setName(restaurantTo.getName());
+        return restaurant;
     }
 }

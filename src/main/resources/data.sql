@@ -13,29 +13,20 @@ VALUES ('Italian Bistro'),
        ('Sushi Place'),
        ('Burger House');
 
-INSERT INTO dish (name, fraction_price, currency)
-VALUES ('Pasta Carbonara', 850, 'RUB'),
-       ('Pizza Margherita', 750, 'RUB'),
-       ('Salmon Sushi', 1200, 'RUB'),
-       ('Tuna Roll', 950, 'RUB'),
-       ('Cheeseburger', 650, 'RUB'),
-       ('French Fries', 300, 'RUB');
-
 INSERT INTO menu (date, restaurant_id)
 VALUES (CURRENT_DATE, 1),
        (CURRENT_DATE, 2),
        (CURRENT_DATE, 3);
 
-INSERT INTO menu_dishes (menu_id, dishes_id)
-VALUES (1, 1),
-       (1, 2),
-       (2, 3),
-       (2, 4),
-       (3, 5),
-       (3, 6);
+INSERT INTO dish (name, fraction_price, currency, menu_id)
+VALUES ('Pasta Carbonara', 85000, 'RUB', 1),
+       ('Pizza Margherita', 75000, 'RUB', 1),
+       ('Salmon Sushi', 120000, 'RUB', 2),
+       ('Tuna Roll', 95000, 'RUB', 2),
+       ('Cheeseburger', 65000, 'RUB', 3),
+       ('French Fries', 30000, 'RUB', 3);
 
 INSERT INTO vote (user_id, restaurant_id, date)
 VALUES (1, 1, '2025-01-01'),
        (2, 2, '2025-01-01'),
        (3, 3, '2025-01-01');
-

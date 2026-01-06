@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.javaops.bootjava.app.config.WebConfig;
-import ru.javaops.bootjava.restaurant.model.Menu;
 import ru.javaops.bootjava.restaurant.service.MenuService;
+import ru.javaops.bootjava.restaurant.to.MenuTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,12 +23,12 @@ public class MenuController {
     private final MenuService menuService;
 
     @GetMapping("/{date}")
-    public Menu get(@PathVariable int restaurantId, @PathVariable LocalDate date) {
+    public MenuTO get(@PathVariable int restaurantId, @PathVariable LocalDate date) {
         return menuService.get(restaurantId, date);
     }
 
     @GetMapping
-    public List<Menu> getAll(@PathVariable int restaurantId) {
+    public List<MenuTO> getAll(@PathVariable int restaurantId) {
         log.info("getAll");
         return menuService.getAll(restaurantId);
     }

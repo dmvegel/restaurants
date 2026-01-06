@@ -4,25 +4,42 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.javaops.bootjava.app.AuthUser;
 import ru.javaops.bootjava.app.config.WebConfig;
 import ru.javaops.bootjava.restaurant.service.VoteService;
+import ru.javaops.bootjava.restaurant.to.RestaurantVotesTO;
+import ru.javaops.bootjava.restaurant.to.VoteTo;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = VoteController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE, version = WebConfig.CURRENT_VERSION)
 @AllArgsConstructor
 @Slf4j
 public class VoteController {
-    static final String REST_URL = "/api/restaurants/{restaurantId}/votes";
+    static final String REST_URL = "/api/votings";
     private final VoteService voteService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/restaurants/{restaurantId}")
     public void vote(@AuthenticationPrincipal AuthUser authUser, @PathVariable int restaurantId) {
         log.info("user id={} vote for restaurantId {}", authUser.id(), restaurantId);
         voteService.save(authUser.getUser(), restaurantId);
+    }
+
+    @GetMapping("/{date}")
+    public List<RestaurantVotesTO> getRestaurantsWithVotes(@PathVariable LocalDate date) {
+        return voteService.getRestaurantsWithVotes(date);
+    }
+
+    @GetMapping("{date}/restaurant/{restaurantId}")
+    public RestaurantVotesTO get(@PathVariable LocalDate date, @PathVariable int restaurantId) {
+        return voteService.getRestaurantWithVotes(restaurantId, date);
+    }
+
+    @GetMapping("{date}/me")
+    public VoteTo getUserVote(@AuthenticationPrincipal AuthUser authUser, @PathVariable LocalDate date) {
+        return new VoteTo(voteService.getRestaurantId(authUser.id(), date));
     }
 }

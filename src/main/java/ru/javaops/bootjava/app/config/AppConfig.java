@@ -49,6 +49,7 @@ public class AppConfig {
                 // ErrorHandling: https://stackoverflow.com/questions/7421474/548473
                 .addMixIn(ProblemDetail.class, MixIn.class)
                 .build();
+
         JsonUtil.setMapper(mapper);
         return mapper;
     }

@@ -9,13 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javaops.bootjava.app.config.WebConfig;
-import ru.javaops.bootjava.restaurant.model.Menu;
 import ru.javaops.bootjava.restaurant.service.MenuService;
+import ru.javaops.bootjava.restaurant.to.MenuTO;
 
 import java.net.URI;
-import java.time.LocalDate;
-
-import static ru.javaops.bootjava.common.validation.ValidationUtil.checkNew;
 
 @RestController
 @RequestMapping(value = AdminMenuController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE, version = WebConfig.CURRENT_VERSION)
@@ -25,28 +22,21 @@ public class AdminMenuController {
     static final String REST_URL = "/api/admin/restaurants/{restaurantId}/menus";
     private final MenuService menuService;
 
-    @DeleteMapping("/{date}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable int restaurantId, @PathVariable LocalDate date) {
-        menuService.delete(restaurantId, date);
-    }
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Menu> create(@PathVariable int restaurantId, @Valid @RequestBody Menu menu) {
-        log.info("create {}", menu);
-        checkNew(menu);
-        Menu created = menuService.save(menu, restaurantId);
+    public ResponseEntity<MenuTO> create(@PathVariable int restaurantId, @Valid @RequestBody MenuTO menuTo) {
+        log.info("create menu {} for restaurantId={}", menuTo, restaurantId);
+        MenuTO created = menuService.create(menuTo, restaurantId);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL + "/{date}")
-                .buildAndExpand(menu.getDate())
+                .path(MenuController.REST_URL + "/{date}")
+                .buildAndExpand(restaurantId, menuTo.getDate())
                 .toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable int restaurantId, @Valid @RequestBody Menu menu) {
-        log.info("update {} with restaurantId={} and date={}", menu, restaurantId, menu.getDate());
-        menuService.save(menu, restaurantId);
+    public void update(@PathVariable int restaurantId, @Valid @RequestBody MenuTO menuTo) {
+        log.info("update {} with restaurantId={} and date={}", menuTo, restaurantId, menuTo.getDate());
+        menuService.update(menuTo, restaurantId);
     }
 }
