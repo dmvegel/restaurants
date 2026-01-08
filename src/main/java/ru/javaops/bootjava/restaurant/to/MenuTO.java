@@ -7,12 +7,10 @@ import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import ru.javaops.bootjava.common.to.BaseTo;
-import ru.javaops.bootjava.restaurant.model.Menu;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
@@ -30,9 +28,9 @@ public class MenuTO extends BaseTo {
         this.dishes = dishes != null ? dishes : new HashSet<>();
     }
 
-    public MenuTO(Menu menu) {
-        super(menu.getId());
-        this.date = menu.getDate();
-        this.dishes = menu.getDishes().stream().map(DishTO::new).collect(Collectors.toSet());
+    public MenuTO(Integer id, LocalDate date, Set<DishTO> dishes) {
+        super(id);
+        this.date = date;
+        this.dishes = dishes;
     }
 }

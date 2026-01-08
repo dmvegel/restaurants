@@ -21,24 +21,24 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     @GetMapping("/{id}")
-    public RestaurantTO get(@PathVariable int id) {
-        return restaurantService.get(id);
+    public RestaurantTO getEnabled(@PathVariable int id) {
+        return restaurantService.getEnabled(id);
     }
 
     @GetMapping("/{id}/with-menu")
-    public RestaurantWithMenuTO get(@PathVariable int id, @RequestParam LocalDate date) {
-        return restaurantService.getWithMenu(id, date);
+    public RestaurantWithMenuTO getEnabledWithMenu(@PathVariable int id, @RequestParam LocalDate date) {
+        return restaurantService.getEnabledWithMenu(id, date);
     }
 
     @GetMapping
-    public List<RestaurantTO> getAll() {
+    public List<RestaurantTO> getAllEnabled() {
         log.info("getAll");
-        return restaurantService.getAll();
+        return restaurantService.getAllEnabled();
     }
 
     @GetMapping("/with-menus")
-    public List<RestaurantWithMenuTO> getAllWithMenus(@RequestParam LocalDate date) {
+    public List<RestaurantWithMenuTO> getAllEnabledWithMenu(@RequestParam(required = false) LocalDate date) {
         log.info("getAllWithMenus");
-        return restaurantService.getAllWithMenus(date != null ? date : LocalDate.now());
+        return restaurantService.getAllEnabledWithMenu(date);
     }
 }

@@ -7,9 +7,12 @@ import ru.javaops.bootjava.common.to.NamedTo;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class RestaurantTO extends NamedTo {
+public class AdminRestaurantTO extends NamedTo {
     @JsonCreator
-    public RestaurantTO(Integer id, String name) {
+    public AdminRestaurantTO(Integer id, String name, boolean enabled) {
         super(id, name);
+        this.enabled = enabled;
     }
+
+    boolean enabled;
 }

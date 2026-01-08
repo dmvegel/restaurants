@@ -13,7 +13,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public interface VoteRepository extends BaseRepository<Vote> {
     long countByRestaurantIdAndDate(Integer restaurantId, LocalDate date);
-    Optional<Vote> findByUserIdAndDate(Integer userId, LocalDate date);
+    Optional<Vote> findByUserIdAndDate(int userId, LocalDate date);
     @Query("SELECT v.restaurant.id AS restaurantId, COUNT(v.id) AS count " +
             "FROM Vote v " +
             "WHERE v.date = :date " +

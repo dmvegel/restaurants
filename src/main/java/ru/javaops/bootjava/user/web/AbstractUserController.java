@@ -35,6 +35,6 @@ public abstract class AbstractUserController {
     }
 
     public void update(User user) {
-        userService.save(user);
+        userService.update(user);
     }
 }

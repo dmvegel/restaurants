@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.javaops.bootjava.common.model.NamedEntity;
-import ru.javaops.bootjava.restaurant.to.RestaurantTO;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -24,7 +23,14 @@ public class Restaurant extends NamedEntity {
     @OrderBy("date DESC")
     private Set<Menu> menus = new LinkedHashSet<>();
 
-    public Restaurant(RestaurantTO restaurantTo) {
-        super(restaurantTo.getId(), restaurantTo.getName());
+    public Restaurant(Integer id, String name) {
+        super(id, name);
     }
+
+    public Restaurant(String name) {
+        super(null, name);
+    }
+
+    @Column(name = "enabled", nullable = false, columnDefinition = "bool default true")
+    boolean enabled = true;
 }

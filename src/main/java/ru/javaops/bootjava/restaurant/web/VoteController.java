@@ -9,7 +9,7 @@ import ru.javaops.bootjava.app.AuthUser;
 import ru.javaops.bootjava.app.config.WebConfig;
 import ru.javaops.bootjava.restaurant.service.VoteService;
 import ru.javaops.bootjava.restaurant.to.RestaurantVotesTO;
-import ru.javaops.bootjava.restaurant.to.VoteTo;
+import ru.javaops.bootjava.restaurant.to.VoteTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,9 +23,9 @@ public class VoteController {
     private final VoteService voteService;
 
     @PostMapping(value = "/restaurants/{restaurantId}")
-    public void vote(@AuthenticationPrincipal AuthUser authUser, @PathVariable int restaurantId) {
+    public VoteTO vote(@AuthenticationPrincipal AuthUser authUser, @PathVariable int restaurantId) {
         log.info("user id={} vote for restaurantId {}", authUser.id(), restaurantId);
-        voteService.save(authUser.getUser(), restaurantId);
+        return voteService.save(authUser.getUser(), restaurantId);
     }
 
     @GetMapping("/{date}")
@@ -39,7 +39,7 @@ public class VoteController {
     }
 
     @GetMapping("{date}/me")
-    public VoteTo getUserVote(@AuthenticationPrincipal AuthUser authUser, @PathVariable LocalDate date) {
-        return new VoteTo(voteService.getRestaurantId(authUser.id(), date));
+    public VoteTO getUserVote(@AuthenticationPrincipal AuthUser authUser, @PathVariable LocalDate date) {
+        return voteService.getByUserIdAndDate(authUser.id(), date);
     }
 }

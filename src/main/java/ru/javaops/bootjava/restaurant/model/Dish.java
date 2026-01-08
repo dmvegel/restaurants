@@ -9,9 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.javaops.bootjava.common.model.NamedEntity;
-import ru.javaops.bootjava.restaurant.to.DishTO;
 import ru.javaops.bootjava.restaurant.util.CurrencyUtil;
 
+import java.math.BigDecimal;
 import java.util.Currency;
 
 @Entity
@@ -35,10 +35,18 @@ public class Dish extends NamedEntity {
     @JsonBackReference
     private Menu menu;
 
-    public Dish(DishTO dishTo) {
-        super(null, dishTo.getName());
-        Currency currency = Currency.getInstance(dishTo.getCurrency());
-        this.fractionPrice = CurrencyUtil.getFractionPrice(dishTo.getPrice(), currency);
+    public Dish(String name, BigDecimal price, String currencyCode, Menu menu) {
+        super(null, name);
+        Currency currency = Currency.getInstance(currencyCode);
+        this.fractionPrice = CurrencyUtil.getFractionPrice(price, currency);
+        this.currency = currency;
+        this.menu = menu;
+    }
+
+    public Dish(String name, BigDecimal price, String currencyCode) {
+        super(null, name);
+        Currency currency = Currency.getInstance(currencyCode);
+        this.fractionPrice = CurrencyUtil.getFractionPrice(price, currency);
         this.currency = currency;
     }
 }

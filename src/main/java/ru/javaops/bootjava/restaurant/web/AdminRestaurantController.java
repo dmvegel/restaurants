@@ -9,11 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javaops.bootjava.app.config.WebConfig;
-import ru.javaops.bootjava.restaurant.model.Restaurant;
 import ru.javaops.bootjava.restaurant.service.RestaurantService;
+import ru.javaops.bootjava.restaurant.to.AdminRestaurantTO;
 import ru.javaops.bootjava.restaurant.to.RestaurantTO;
 
 import java.net.URI;
+import java.util.List;
 
 import static ru.javaops.bootjava.common.validation.ValidationUtil.assureIdConsistent;
 import static ru.javaops.bootjava.common.validation.ValidationUtil.checkNew;
@@ -26,13 +27,24 @@ public class AdminRestaurantController {
     static final String REST_URL = "/api/admin/restaurants";
     private final RestaurantService restaurantService;
 
+    @GetMapping("/{id}")
+    public AdminRestaurantTO get(@PathVariable int id) {
+        return restaurantService.get(id);
+    }
+
+    @GetMapping
+    public List<AdminRestaurantTO> getAll() {
+        log.info("getAll");
+        return restaurantService.getAll();
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Restaurant> create(@Valid @RequestBody RestaurantTO restaurantTo) {
+    public ResponseEntity<AdminRestaurantTO> create(@Valid @RequestBody RestaurantTO restaurantTo) {
         log.info("create {}", restaurantTo);
         checkNew(restaurantTo);
-        Restaurant created = restaurantService.create(restaurantTo);
+        AdminRestaurantTO created = restaurantService.create(restaurantTo);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(RestaurantController.REST_URL + "/{id}")
+                .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
@@ -43,5 +55,12 @@ public class AdminRestaurantController {
         log.info("update {} with id={}", restaurantTo, id);
         assureIdConsistent(restaurantTo, id);
         restaurantService.update(restaurantTo);
+    }
+
+    @PatchMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enable(@PathVariable int id, @RequestParam boolean enabled) {
+        log.info(enabled ? "enable restaurant {}" : "disable restaurant {}", id);
+        restaurantService.enable(id, enabled);
     }
 }

@@ -1,16 +1,20 @@
 package ru.javaops.bootjava.restaurant.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import ru.javaops.bootjava.common.error.NotFoundException;
 import ru.javaops.bootjava.common.service.BaseService;
-import ru.javaops.bootjava.restaurant.model.Dish;
 import ru.javaops.bootjava.restaurant.model.Menu;
 import ru.javaops.bootjava.restaurant.repository.MenuRepository;
 import ru.javaops.bootjava.restaurant.to.MenuTO;
+import ru.javaops.bootjava.restaurant.util.DishUtil;
+import ru.javaops.bootjava.restaurant.util.MenuUtil;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static ru.javaops.bootjava.common.validation.ValidationUtil.assureIdConsistent;
 
 @Service
 public class MenuService extends BaseService<Menu, MenuRepository> {
@@ -21,45 +25,45 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
         this.restaurantService = restaurantService;
     }
 
-    public List<MenuTO> getAll(int restaurantId) {
-        List<Menu> menus = repository.findByRestaurantIdOrderByDateDesc(restaurantId);
-        if (menus.isEmpty()) {
-            throw new NotFoundException("Restaurant with id=" + restaurantId + " not found");
-        }
-        return menus.stream().map(MenuTO::new).toList();
+    public List<MenuTO> getAllEnabled(int restaurantId) {
+        List<Menu> menus = repository.findByRestaurantIdOrderByDateDescEnabled(restaurantId);
+        return MenuUtil.getListTo(menus);
     }
 
-    public Menu get(int id) {
-        return getExisted(id);
+    public List<MenuTO> getAll(int restaurantId) {
+        List<Menu> menus = repository.findByRestaurantIdOrderByDateDesc(restaurantId);
+        return MenuUtil.getListTo(menus);
+    }
+
+    public MenuTO getEnabled(int restaurantId, LocalDate date) {
+        return MenuUtil.getTo(getByEnabledRestaurantIdAndDate(restaurantId, date));
     }
 
     public MenuTO get(int restaurantId, LocalDate date) {
-        return new MenuTO(getByIdAndDate(restaurantId, date));
+        return MenuUtil.getTo(getByRestaurantIdAndDate(restaurantId, date));
     }
 
-    private Menu getByIdAndDate(int restaurantId, LocalDate date) {
-        return repository.findByRestaurantIdAndDate(restaurantId, date).orElseThrow(
-                () -> new NotFoundException("Menu with restaurantId=" + restaurantId + " and date =" + date + " not found"));
+    private Menu getByEnabledRestaurantIdAndDate(int restaurantId, LocalDate date) {
+        return repository.findByRestaurantIdAndDateEnabled(restaurantId, date).orElseThrow(
+                () -> new NotFoundException(String.format("Menu with restaurantId=%d and date=%s not found", restaurantId, date)));
     }
 
     @Transactional
     public MenuTO create(MenuTO menuTo, int restaurantId) {
-        Menu menu = new Menu(menuTo, restaurantService.getReference(restaurantId));
-        return new MenuTO(repository.save(menu));
+        Menu menu = MenuUtil.getFromTo(menuTo, restaurantService.getReference(restaurantId));
+        return MenuUtil.getTo(repository.save(menu));
     }
 
     @Transactional
-    public Menu update(MenuTO menuTo, int restaurantId) {
-        Menu saved = getByIdAndDate(restaurantId, menuTo.getDate());
+    public void update(MenuTO menuTo, int restaurantId) {
+        Menu saved = getByRestaurantIdAndDate(restaurantId, menuTo.getDate());
+        assureIdConsistent(menuTo, saved.getId());
         saved.getDishes().clear();
-        menuTo.getDishes().stream()
-                .map(Dish::new)
-                .forEach(dish -> {
-                    dish.setMenu(saved);
-                    saved.getDishes().add(dish);
-                });
-//        saved.setDishes(menuTo.getDishes().stream().map(Dish::new).collect(Collectors.toSet()));
-//        saved.getDishes().forEach(dish -> dish.setMenu(saved));
-        return saved;
+        saved.getDishes().addAll(DishUtil.getListFromTo(menuTo.getDishes(), saved));
+    }
+
+    private Menu getByRestaurantIdAndDate(int restaurantId, @NotNull LocalDate date) {
+        return repository.findByRestaurantIdAndDate(restaurantId, date).orElseThrow(
+                () -> new NotFoundException(String.format("Menu with restaurantId=%d and date=%s not found", restaurantId, date)));
     }
 }

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Value;
-import ru.javaops.bootjava.restaurant.model.Dish;
 import ru.javaops.bootjava.restaurant.util.CurrencyUtil;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 
 @Value
 public class DishTO {
@@ -28,18 +28,18 @@ public class DishTO {
     )
     @Size(min = CurrencyUtil.CODE_LENGTH, max = CurrencyUtil.CODE_LENGTH)
     @Pattern(regexp = CurrencyUtil.CODE_PATTERN)
-    String currency;
+    String currencyCode;
 
     @JsonCreator
-    public DishTO(String name, BigDecimal price, String currency) {
+    public DishTO(String name, BigDecimal price, String currencyCode) {
         this.name = name;
         this.price = price;
-        this.currency = currency;
+        this.currencyCode = currencyCode;
     }
 
-    public DishTO(Dish dish) {
-        this.name = dish.getName();
-        this.currency = dish.getCurrency().getCurrencyCode();
-        this.price = CurrencyUtil.getPrice(dish.getFractionPrice(), dish.getCurrency());
+    public DishTO(String name, long fractionPrice, Currency currency) {
+        this.name = name;
+        this.currencyCode = currency.getCurrencyCode();
+        this.price = CurrencyUtil.getPrice(fractionPrice, currency);
     }
 }

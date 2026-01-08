@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.javaops.bootjava.common.model.BaseEntity;
-import ru.javaops.bootjava.restaurant.to.MenuTO;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -22,16 +21,14 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu extends BaseEntity {
-    public Menu(MenuTO menuTo, Restaurant restaurant) {
-        this.date = menuTo.getDate();
+    public Menu(Integer id, LocalDate date, Set<Dish> dishes, Restaurant restaurant) {
+        super(id);
+        this.date = date;
         this.restaurant = restaurant;
-//        this.dishes = menuTo.getDishes().stream().map(Dish::new).collect(Collectors.toSet());
-        menuTo.getDishes().stream()
-                .map(Dish::new)
-                .forEach(dish -> {
-                    dish.setMenu(this);
-                    this.dishes.add(dish);
-                });
+        dishes.forEach(dish -> {
+            dish.setMenu(this);
+            this.dishes.add(dish);
+        });
     }
 
     @Column(name = "date", nullable = false)

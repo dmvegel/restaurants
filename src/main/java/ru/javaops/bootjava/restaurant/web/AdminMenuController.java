@@ -13,6 +13,8 @@ import ru.javaops.bootjava.restaurant.service.MenuService;
 import ru.javaops.bootjava.restaurant.to.MenuTO;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = AdminMenuController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE, version = WebConfig.CURRENT_VERSION)
@@ -22,12 +24,23 @@ public class AdminMenuController {
     static final String REST_URL = "/api/admin/restaurants/{restaurantId}/menus";
     private final MenuService menuService;
 
+    @GetMapping("/{date}")
+    public MenuTO get(@PathVariable int restaurantId, @PathVariable LocalDate date) {
+        return menuService.get(restaurantId, date);
+    }
+
+    @GetMapping
+    public List<MenuTO> getAll(@PathVariable int restaurantId) {
+        log.info("getAll");
+        return menuService.getAll(restaurantId);
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MenuTO> create(@PathVariable int restaurantId, @Valid @RequestBody MenuTO menuTo) {
         log.info("create menu {} for restaurantId={}", menuTo, restaurantId);
         MenuTO created = menuService.create(menuTo, restaurantId);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(MenuController.REST_URL + "/{date}")
+                .path(REST_URL + "/{date}")
                 .buildAndExpand(restaurantId, menuTo.getDate())
                 .toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);

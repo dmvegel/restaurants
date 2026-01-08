@@ -46,14 +46,19 @@ public class UserService extends BaseService<User, UserRepository> {
     }
 
     @Transactional
-    public User save(User user) {
-        String oldEmail = user.isNew() ? null : getExisted(user.getId()).getEmail();
-        User saved = prepareAndSave(user);
-        if (oldEmail != null && !oldEmail.equals(saved.getEmail())) {
+    public User create(User user) {
+        return prepareAndSave(user);
+    }
+
+    @Transactional
+    public User update(User user) {
+        User saved = getExisted(user.getId());
+        String oldEmail = saved.getEmail();
+        if (!user.getEmail().equals(oldEmail)) {
             userCache.removeUserFromCache(oldEmail);
         }
         userCache.removeUserFromCache(saved.getEmail());
-        return saved;
+        return prepareAndSave(user);
     }
 
     private User prepareAndSave(User user) {

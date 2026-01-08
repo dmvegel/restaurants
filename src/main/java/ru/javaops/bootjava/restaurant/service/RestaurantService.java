@@ -6,11 +6,12 @@ import ru.javaops.bootjava.common.error.NotFoundException;
 import ru.javaops.bootjava.common.service.BaseService;
 import ru.javaops.bootjava.restaurant.model.Restaurant;
 import ru.javaops.bootjava.restaurant.repository.RestaurantRepository;
+import ru.javaops.bootjava.restaurant.to.AdminRestaurantTO;
 import ru.javaops.bootjava.restaurant.to.RestaurantTO;
 import ru.javaops.bootjava.restaurant.to.RestaurantWithMenuTO;
+import ru.javaops.bootjava.restaurant.util.RestaurantUtil;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -21,46 +22,60 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
         super(repository);
     }
 
-    public List<RestaurantWithMenuTO> getAllWithMenus(LocalDate date) {
-        return repository.getRestaurantsWithMenusByDate(date)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(RestaurantWithMenuTO::new)
-                .toList();
-    }
-
-    public RestaurantTO get(int id) {
-        return new RestaurantTO(getExisted(id));
+    public AdminRestaurantTO get(int id) {
+        Restaurant restaurant = getExisted(id);
+        return RestaurantUtil.getAdminTo(restaurant);
     }
 
     public Restaurant getReference(int id) {
         return repository.getReferenceById(id);
     }
 
-    public List<RestaurantTO> getAll() {
-        return repository.findAll().stream().map(RestaurantTO::new).toList();
+    public Restaurant getReferenceEnabled(int id) {
+        return repository.getReferenceEnabled(id)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
     }
 
-//    public Restaurant getWithMenus(int id) {
-//        return repository.getRestaurantWithAllMenus(id).orElseThrow(
-//                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
-//    }
+    public List<AdminRestaurantTO> getAll() {
+        return repository.findAll().stream()
+                .map(RestaurantUtil::getAdminTo).toList();
+    }
 
-    public RestaurantWithMenuTO getWithMenu(int id, LocalDate date) {
-        return repository.getRestaurantWithMenu(id, date).map(RestaurantWithMenuTO::new).orElseThrow(
-                () -> new NotFoundException("Menu with restaurantId=" + id + " for date=" + date + " not found"));
+    public RestaurantTO getEnabled(int id) {
+        return RestaurantUtil.getTo(repository.getEnabledById(id)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id))));
+    }
+
+    public RestaurantWithMenuTO getEnabledWithMenu(int id, LocalDate date) {
+        return RestaurantUtil.getWithMenuTo(repository.getEnabledWithMenu(id, date)
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id))));
+    }
+
+    public List<RestaurantTO> getAllEnabled() {
+        return repository.getAllEnabled().stream().map(RestaurantUtil::getTo).toList();
+    }
+
+    public List<RestaurantWithMenuTO> getAllEnabledWithMenu(LocalDate date) {
+        LocalDate actualDate = date != null ? date : LocalDate.now();
+        return repository.getEnabledWithMenusByDate(actualDate).stream().map(RestaurantUtil::getWithMenuTo).toList();
     }
 
     @Transactional
-    public Restaurant create(RestaurantTO restaurantTo) {
-        return repository.save(new Restaurant(restaurantTo));
+    public AdminRestaurantTO create(RestaurantTO restaurantTo) {
+        Restaurant restaurant = repository.save(new Restaurant(restaurantTo.getName()));
+        return RestaurantUtil.getAdminTo(restaurant);
     }
 
     @Transactional
     public Restaurant update(RestaurantTO restaurantTo) {
-        Restaurant restaurant = repository.findById(restaurantTo.getId()).orElseThrow(
-                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, restaurantTo.getId())));
+        Restaurant restaurant = getExisted(restaurantTo.getId());
         restaurant.setName(restaurantTo.getName());
         return restaurant;
+    }
+
+    @Transactional
+    public void enable(int id, boolean enabled) {
+        Restaurant restaurant = getExisted(id);
+        restaurant.setEnabled(enabled);
     }
 }
