@@ -59,7 +59,7 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
         Menu saved = getByRestaurantIdAndDate(restaurantId, menuTo.getDate());
         assureIdConsistent(menuTo, saved.getId());
         saved.getDishes().clear();
-        saved.getDishes().addAll(DishUtil.getListFromTo(menuTo.getDishes(), saved));
+        saved.getDishes().addAll(DishUtil.getListFromTo(menuTo.getDishes()));
     }
 
     private Menu getByRestaurantIdAndDate(int restaurantId, @NotNull LocalDate date) {

@@ -1,7 +1,5 @@
 package ru.javaops.bootjava.restaurant.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,10 +23,7 @@ public class Menu extends BaseEntity {
         super(id);
         this.date = date;
         this.restaurant = restaurant;
-        dishes.forEach(dish -> {
-            dish.setMenu(this);
-            this.dishes.add(dish);
-        });
+        this.dishes.addAll(dishes);
     }
 
     @Column(name = "date", nullable = false)
@@ -38,11 +33,9 @@ public class Menu extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     @NotNull
-    @JsonIgnore
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @Size(min = 1)
-    @JsonManagedReference
     private Set<Dish> dishes = new HashSet<>();
 }

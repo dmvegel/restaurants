@@ -1,7 +1,8 @@
 package ru.javaops.bootjava.restaurant.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -28,20 +29,6 @@ public class Dish extends NamedEntity {
     @Column(name = "currency", nullable = false)
     @NotNull
     private Currency currency;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
-    @NotNull
-    @JsonBackReference
-    private Menu menu;
-
-    public Dish(String name, BigDecimal price, String currencyCode, Menu menu) {
-        super(null, name);
-        Currency currency = Currency.getInstance(currencyCode);
-        this.fractionPrice = CurrencyUtil.getFractionPrice(price, currency);
-        this.currency = currency;
-        this.menu = menu;
-    }
 
     public Dish(String name, BigDecimal price, String currencyCode) {
         super(null, name);
