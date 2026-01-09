@@ -33,7 +33,7 @@ public class VoteController {
         return voteService.getRestaurantsWithVotes(date);
     }
 
-    @GetMapping("{date}/restaurant/{restaurantId}")
+    @GetMapping("{date}/restaurants/{restaurantId}")
     public RestaurantVotesTO get(@PathVariable LocalDate date, @PathVariable int restaurantId) {
         return voteService.getRestaurantWithVotes(restaurantId, date);
     }

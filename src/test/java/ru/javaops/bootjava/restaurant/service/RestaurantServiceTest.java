@@ -8,8 +8,6 @@ import ru.javaops.bootjava.restaurant.to.AdminRestaurantTO;
 import ru.javaops.bootjava.restaurant.to.RestaurantTO;
 import ru.javaops.bootjava.restaurant.util.RestaurantUtil;
 
-import java.util.Set;
-
 import static ru.javaops.bootjava.restaurant.MenuTestData.MENU_DATE;
 import static ru.javaops.bootjava.restaurant.RestaurantTestData.*;
 
@@ -24,7 +22,7 @@ class RestaurantServiceTest extends AbstractServiceTest {
 
     @Test
     void getDisabled() {
-        validateRootCause(NotFoundException.class, () -> restaurantService.getEnabled(RESTAURANT_4_ID));
+        validateRootCause(NotFoundException.class, () -> restaurantService.getEnabled(DISABLED_RESTAURANT_ID));
     }
 
     @Test
@@ -35,7 +33,7 @@ class RestaurantServiceTest extends AbstractServiceTest {
 
     @Test
     void getWithMenuDisabled() {
-        validateRootCause(NotFoundException.class, () -> restaurantService.getEnabledWithMenu(RESTAURANT_4_ID, MENU_DATE));
+        validateRootCause(NotFoundException.class, () -> restaurantService.getEnabledWithMenu(DISABLED_RESTAURANT_ID, MENU_DATE));
     }
 
     @Test
@@ -57,9 +55,9 @@ class RestaurantServiceTest extends AbstractServiceTest {
     @Test
     void updateDisabled() {
         RestaurantTO restaurantTO = getUpdated();
-        restaurantTO.setId(RESTAURANT_4_ID);
+        restaurantTO.setId(DISABLED_RESTAURANT_ID);
         restaurantService.update(restaurantTO);
-        AdminRestaurantTO fetched = restaurantService.get(RESTAURANT_4_ID);
+        AdminRestaurantTO fetched = restaurantService.get(DISABLED_RESTAURANT_ID);
         AdminRestaurantTO adminRestaurantTO = RestaurantUtil.getAdminTo(restaurantTO, false);
         ADMIN_RESTAURANT_TO_MATCHER.assertMatch(fetched, adminRestaurantTO);
     }
@@ -74,11 +72,26 @@ class RestaurantServiceTest extends AbstractServiceTest {
     @Test
     void getAllWithMenusEnabled() {
         RESTAURANT_WITH_MENUS_TO_MATCHER
-                .assertMatch(restaurantService.getAllEnabledWithMenu(MENU_DATE), Set.of(restaurant_1_on_menu1_date, restaurant_2_with_menu, restaurant_3_with_menu));
+                .assertMatch(restaurantService.getAllEnabledWithMenu(MENU_DATE), restaurant_1_on_menu1_date, restaurant_2_with_menu, restaurant_3_with_menu);
     }
 
     @Test
     void getNotFound() {
         validateRootCause(NotFoundException.class, () -> restaurantService.get(RESTAURANT_NOT_FOUND_ID));
+    }
+
+    @Test
+    void disable() {
+        restaurantService.enable(RESTAURANT_1_ID, false);
+        validateRootCause(NotFoundException.class, () -> restaurantService.getEnabled(RESTAURANT_1_ID));
+    }
+
+    @Test
+    void getAll() {
+        ADMIN_RESTAURANT_TO_MATCHER.assertMatch(restaurantService.getAll(),
+                admin_restaurant_1,
+                admin_restaurant_2,
+                admin_restaurant_3,
+                admin_disabled_restaurant);
     }
 }

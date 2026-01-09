@@ -9,7 +9,6 @@ import ru.javaops.bootjava.common.time.TimeService;
 import ru.javaops.bootjava.restaurant.to.VoteTO;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -36,7 +35,7 @@ class VoteServiceTest extends AbstractServiceTest {
 
     @Test
     void voteForDisabled() {
-        validateRootCause(NotFoundException.class, () -> voteService.save(user, RESTAURANT_4_ID));
+        validateRootCause(NotFoundException.class, () -> voteService.save(user, DISABLED_RESTAURANT_ID));
     }
 
     @Test
@@ -59,7 +58,7 @@ class VoteServiceTest extends AbstractServiceTest {
     @Test
     void getRestaurantsWithVotes() {
         RESTAURANT_VOTES_TO_MATCHER.assertMatch(voteService.getRestaurantsWithVotes(VOTE_DATE),
-                List.of(restaurant_1_with_votes, restaurant_2_with_votes, restaurant_3_with_votes));
+                restaurant_1_with_votes, restaurant_2_with_votes, restaurant_3_with_votes);
     }
 
     @Test

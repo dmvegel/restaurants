@@ -6,11 +6,9 @@ import ru.javaops.bootjava.common.error.NotFoundException;
 import ru.javaops.bootjava.common.service.AbstractServiceTest;
 import ru.javaops.bootjava.restaurant.to.MenuTO;
 
-import java.util.Set;
-
 import static ru.javaops.bootjava.restaurant.MenuTestData.*;
+import static ru.javaops.bootjava.restaurant.RestaurantTestData.DISABLED_RESTAURANT_ID;
 import static ru.javaops.bootjava.restaurant.RestaurantTestData.RESTAURANT_1_ID;
-import static ru.javaops.bootjava.restaurant.RestaurantTestData.RESTAURANT_4_ID;
 
 class MenuServiceTest extends AbstractServiceTest {
     @Autowired
@@ -33,18 +31,18 @@ class MenuServiceTest extends AbstractServiceTest {
 
     @Test
     void createDisabledRestaurantMenu() {
-        MenuTO created = menuService.create(getNew(), RESTAURANT_4_ID);
+        MenuTO created = menuService.create(getNew(), DISABLED_RESTAURANT_ID);
         MenuTO menuTo = getNew();
         menuTo.setId(created.getId());
-        MENU_TO_MATCHER.assertMatch(menuService.get(RESTAURANT_4_ID, NEW_MENU_DATE), menuTo);
+        MENU_TO_MATCHER.assertMatch(menuService.get(DISABLED_RESTAURANT_ID, NEW_MENU_DATE), menuTo);
     }
 
     @Test
     void updateDisabledRestaurantMenu() {
         MenuTO menuTo = getUpdated();
         menuTo.setId(MENU_4_ID);
-        menuService.update(menuTo, RESTAURANT_4_ID);
-        MENU_TO_MATCHER.assertMatch(menuService.get(RESTAURANT_4_ID, MENU_DATE), menuTo);
+        menuService.update(menuTo, DISABLED_RESTAURANT_ID);
+        MENU_TO_MATCHER.assertMatch(menuService.get(DISABLED_RESTAURANT_ID, MENU_DATE), menuTo);
     }
 
     @Test
@@ -79,6 +77,6 @@ class MenuServiceTest extends AbstractServiceTest {
 
     @Test
     void getAllEnabled() {
-        MENU_TO_MATCHER.assertMatch(menuService.getAllEnabled(RESTAURANT_1_ID), Set.of(menu_1, menu_1_2));
+        MENU_TO_MATCHER.assertMatch(menuService.getAllEnabled(RESTAURANT_1_ID), menu_1, menu_1_2);
     }
 }
