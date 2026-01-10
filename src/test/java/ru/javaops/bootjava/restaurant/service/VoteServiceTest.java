@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import ru.javaops.bootjava.common.error.NotFoundException;
+import ru.javaops.bootjava.common.error.VoteTimeExpiredException;
 import ru.javaops.bootjava.common.service.AbstractServiceTest;
 import ru.javaops.bootjava.common.time.TimeService;
 import ru.javaops.bootjava.restaurant.to.VoteTO;
@@ -43,8 +44,8 @@ class VoteServiceTest extends AbstractServiceTest {
         when(timeService.now()).thenReturn(CHANGE_DEADLINE.minusMinutes(1));
         VoteTO saved = voteService.save(user, RESTAURANT_1_ID);
         assertThat(saved.restaurantId()).isEqualTo(RESTAURANT_1_ID);
-        VoteTO changed = voteService.save(user, RESTAURANT_3_ID);
-        assertThat(changed.restaurantId()).isEqualTo(RESTAURANT_3_ID);
+        VoteTO changed = voteService.save(user, RESTAURANT_1_ID);
+        assertThat(changed.restaurantId()).isEqualTo(RESTAURANT_1_ID);
     }
 
     @Test
@@ -52,7 +53,7 @@ class VoteServiceTest extends AbstractServiceTest {
         when(timeService.now()).thenReturn(CHANGE_DEADLINE.plusMinutes(1));
         VoteTO saved = voteService.save(user, RESTAURANT_1_ID);
         assertThat(saved.restaurantId()).isEqualTo(RESTAURANT_1_ID);
-        validateRootCause(IllegalStateException.class, () -> voteService.save(user, RESTAURANT_3_ID));
+        validateRootCause(VoteTimeExpiredException.class, () -> voteService.save(user, RESTAURANT_1_ID));
     }
 
     @Test

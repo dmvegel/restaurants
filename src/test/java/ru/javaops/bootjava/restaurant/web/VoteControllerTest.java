@@ -42,6 +42,22 @@ class VoteControllerTest extends AbstractControllerTest {
 
     @Test
     @WithUserDetails(USER_MAIL)
+    void voteWithoutMenu() throws Exception {
+        perform(MockMvcRequestBuilders.post(
+                REST_URL_RESTAURANTS_SLASH + RESTAURANT_3_ID))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithUserDetails(USER_MAIL)
+    void voteWithoutDishes() throws Exception {
+        perform(MockMvcRequestBuilders.post(
+                REST_URL_RESTAURANTS_SLASH + RESTAURANT_2_ID))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithUserDetails(USER_MAIL)
     void voteForDisabledRestaurant() throws Exception {
         perform(MockMvcRequestBuilders.post(
                 REST_URL_RESTAURANTS_SLASH + DISABLED_RESTAURANT_ID))

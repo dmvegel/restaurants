@@ -2,8 +2,8 @@ package ru.javaops.bootjava.restaurant.to;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import ru.javaops.bootjava.common.to.BaseTo;
@@ -18,7 +18,7 @@ public class MenuTO extends BaseTo {
     @NotNull
     LocalDate date;
 
-    @Size(min = 1)
+    @Valid
     Set<DishTO> dishes;
 
     @JsonCreator

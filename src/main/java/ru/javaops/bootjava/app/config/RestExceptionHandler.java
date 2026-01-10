@@ -27,6 +27,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.javaops.bootjava.common.error.AppException;
 import ru.javaops.bootjava.common.error.ErrorType;
+import ru.javaops.bootjava.common.error.VoteTimeExpiredException;
 
 import java.io.FileNotFoundException;
 import java.net.URI;
@@ -46,7 +47,6 @@ public class RestExceptionHandler {
     @Getter
     private final MessageSource messageSource;
 
-    //    https://stackoverflow.com/a/52254601/548473
     static final Map<Class<? extends Throwable>, ErrorType> HTTP_STATUS_MAP = new LinkedHashMap<>() {
         {
 // more specific first
@@ -63,6 +63,7 @@ public class RestExceptionHandler {
             put(ServletRequestBindingException.class, BAD_REQUEST);
             put(RequestRejectedException.class, BAD_REQUEST);
             put(AccessDeniedException.class, FORBIDDEN);
+            put(VoteTimeExpiredException.class, CONFLICT);
         }
     };
 
@@ -125,7 +126,6 @@ public class RestExceptionHandler {
                 .findAny().map(Map.Entry::getValue);
     }
 
-    //    https://datatracker.ietf.org/doc/html/rfc7807
     private ProblemDetail createProblemDetail(Throwable ex, String path, ErrorType type, String defaultDetail, @NonNull Map<String, Object> additionalParams) {
         ErrorResponse.Builder builder = ErrorResponse.builder(ex, type.status, defaultDetail);
         ProblemDetail pd = builder
@@ -135,7 +135,6 @@ public class RestExceptionHandler {
         return pd;
     }
 
-    //  https://stackoverflow.com/a/65442410/548473
     @NonNull
     private static Throwable getRootCause(@NonNull Throwable t) {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);

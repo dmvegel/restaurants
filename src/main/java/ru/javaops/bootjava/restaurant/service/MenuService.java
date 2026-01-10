@@ -20,6 +20,8 @@ import static ru.javaops.bootjava.common.validation.ValidationUtil.assureIdConsi
 
 @Service
 public class MenuService extends BaseService<Menu, MenuRepository> {
+    private static final String NOT_FOUND_RESTAURANT = "Menu with restaurantId=%d and date=%s not found";
+
     private final RestaurantService restaurantService;
 
     public MenuService(MenuRepository repository, RestaurantService restaurantService) {
@@ -49,7 +51,7 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
 
     private Menu getByEnabledRestaurantIdAndDate(int restaurantId, LocalDate date) {
         return repository.findByRestaurantIdAndDateEnabled(restaurantId, date).orElseThrow(
-                () -> new NotFoundException(String.format("Menu with restaurantId=%d and date=%s not found", restaurantId, date)));
+                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, restaurantId, date)));
     }
 
     @CacheEvict(value = {"menusByRestaurant", "menuByRestaurantAndDate"}, allEntries = true)
@@ -70,6 +72,6 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
 
     private Menu getByRestaurantIdAndDate(int restaurantId, @NotNull LocalDate date) {
         return repository.findByRestaurantIdAndDate(restaurantId, date).orElseThrow(
-                () -> new NotFoundException(String.format("Menu with restaurantId=%d and date=%s not found", restaurantId, date)));
+                () -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, restaurantId, date)));
     }
 }

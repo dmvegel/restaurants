@@ -26,7 +26,6 @@ public class RestaurantTestData {
     public static final RestaurantWithMenuTO restaurant_1_on_menu1_date = new RestaurantWithMenuTO(RESTAURANT_1_ID, "Italian Bistro", Set.of(menu_1));
     public static final RestaurantWithMenuTO restaurant_2_with_menu = new RestaurantWithMenuTO(RESTAURANT_2_ID, "Sushi Place", Set.of(menu_2));
     public static final RestaurantWithMenuTO restaurant_3_with_menu = new RestaurantWithMenuTO(RESTAURANT_3_ID, "Burger House", Set.of(menu_3));
-    public static final RestaurantWithMenuTO disabled_restaurant_with_menu = new RestaurantWithMenuTO(DISABLED_RESTAURANT_ID, "Disabled Restaurant", Set.of(menu_3));
 
     public static final RestaurantVotesTO restaurant_1_with_votes = new RestaurantVotesTO(RESTAURANT_1_ID, "Italian Bistro", 1);
     public static final RestaurantVotesTO restaurant_2_with_votes = new RestaurantVotesTO(RESTAURANT_2_ID, "Sushi Place", 1);
@@ -46,8 +45,6 @@ public class RestaurantTestData {
     public static RestaurantTO getNew() {
         return new RestaurantTO(null, "New Restaurant");
     }
-
-
 
     public static RestaurantTO getUpdated() {
         return new RestaurantTO(RESTAURANT_1_ID, "UpdatedName");

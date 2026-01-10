@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Value;
+import ru.javaops.bootjava.common.validation.NoHtml;
 import ru.javaops.bootjava.restaurant.util.CurrencyUtil;
 
 import java.math.BigDecimal;
@@ -12,6 +13,8 @@ import java.util.Currency;
 @Value
 public class DishTO {
     @NotBlank
+    @Size(min = 1, max = 64)
+    @NoHtml
     String name;
 
     @NotNull
@@ -28,6 +31,7 @@ public class DishTO {
     )
     @Size(min = CurrencyUtil.CODE_LENGTH, max = CurrencyUtil.CODE_LENGTH)
     @Pattern(regexp = CurrencyUtil.CODE_PATTERN)
+    @NoHtml
     String currencyCode;
 
     @JsonCreator

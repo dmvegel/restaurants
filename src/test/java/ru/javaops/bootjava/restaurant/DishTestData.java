@@ -13,6 +13,7 @@ public class DishTestData {
     public static final DishTO DISH_6 = new DishTO("French Fries", BigDecimal.valueOf(300.00), "RUB");
     public static final DishTO DISH_7 = new DishTO("Juice", BigDecimal.valueOf(250.00), "RUB");
     public static final DishTO DISH_8 = new DishTO("Dish", BigDecimal.valueOf(300.00), "RUB");
+    public static final DishTO DISH_9 = new DishTO("Another Dish", BigDecimal.valueOf(300.00), "RUB");
 
     public static final DishTO NEW_DISH_1 = new DishTO("New Dish", BigDecimal.valueOf(1000), "RUB");
 }

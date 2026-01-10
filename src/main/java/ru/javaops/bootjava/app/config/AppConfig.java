@@ -30,12 +30,10 @@ public class AppConfig {
         return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");
     }
 
-    //   https://stackoverflow.com/a/74630129/548473
     @JsonAutoDetect(fieldVisibility = NONE, getterVisibility = ANY)
     interface MixIn extends ProblemDetailJacksonMixin {
     }
 
-    //    https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide#upgrading-jackson
     @Bean
     ObjectMapper objectMapper() {
         ObjectMapper mapper = JsonMapper.builder()
@@ -46,7 +44,6 @@ public class AppConfig {
                         .withVisibility(PropertyAccessor.IS_GETTER, NONE)
                 )
                 .addModule(new Hibernate7Module())
-                // ErrorHandling: https://stackoverflow.com/questions/7421474/548473
                 .addMixIn(ProblemDetail.class, MixIn.class)
                 .build();
 

@@ -3,12 +3,14 @@ package ru.javaops.bootjava.restaurant.service;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.javaops.bootjava.common.error.NotFoundException;
+import ru.javaops.bootjava.common.error.VoteTimeExpiredException;
 import ru.javaops.bootjava.common.service.BaseService;
 import ru.javaops.bootjava.common.time.TimeService;
 import ru.javaops.bootjava.restaurant.model.Restaurant;
 import ru.javaops.bootjava.restaurant.model.Vote;
 import ru.javaops.bootjava.restaurant.projection.RestaurantVoteProjection;
 import ru.javaops.bootjava.restaurant.repository.VoteRepository;
+import ru.javaops.bootjava.restaurant.to.MenuTO;
 import ru.javaops.bootjava.restaurant.to.RestaurantTO;
 import ru.javaops.bootjava.restaurant.to.RestaurantVotesTO;
 import ru.javaops.bootjava.restaurant.to.VoteTO;
@@ -24,12 +26,17 @@ import static ru.javaops.bootjava.common.time.TimeService.CHANGE_DEADLINE;
 @Service
 public class VoteService extends BaseService<Vote, VoteRepository> {
     private final RestaurantService restaurantService;
+    private final MenuService menuService;
     private final TimeService timeService;
 
-    public VoteService(VoteRepository repository, RestaurantService restaurantService, TimeService timeService) {
+    public VoteService(VoteRepository repository,
+                       RestaurantService restaurantService,
+                       TimeService timeService,
+                       MenuService menuService) {
         super(repository);
         this.restaurantService = restaurantService;
         this.timeService = timeService;
+        this.menuService = menuService;
     }
 
     public List<RestaurantVotesTO> getRestaurantsWithVotes(LocalDate date) {
@@ -68,6 +75,11 @@ public class VoteService extends BaseService<Vote, VoteRepository> {
         Restaurant restaurant = restaurantService.getReferenceEnabled(restaurantId);
         LocalDate today = LocalDate.now();
 
+        MenuTO menu = menuService.getEnabled(restaurantId, today);
+        if (menu.getDishes().isEmpty()) {
+            throw new NotFoundException("Cannot vote for restaurant without dishes in menu");
+        }
+
         Vote vote = repository.findByUserIdAndDate(user.getId(), today)
                 .map(existing -> {
                     checkDeadline();
@@ -81,7 +93,7 @@ public class VoteService extends BaseService<Vote, VoteRepository> {
 
     private void checkDeadline() {
         if (!timeService.now().isBefore(CHANGE_DEADLINE)) {
-            throw new IllegalStateException("Cannot change vote after " + CHANGE_DEADLINE);
+            throw new VoteTimeExpiredException("Cannot change vote after " + CHANGE_DEADLINE);
         }
     }
 }

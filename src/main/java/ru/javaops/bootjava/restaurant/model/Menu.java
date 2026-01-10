@@ -2,7 +2,6 @@ package ru.javaops.bootjava.restaurant.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +35,5 @@ public class Menu extends BaseEntity {
     private Restaurant restaurant;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @Size(min = 1)
     private Set<Dish> dishes = new HashSet<>();
 }

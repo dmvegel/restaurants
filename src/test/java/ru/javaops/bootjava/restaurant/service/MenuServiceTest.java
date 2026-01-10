@@ -77,6 +77,6 @@ class MenuServiceTest extends AbstractServiceTest {
 
     @Test
     void getAllEnabled() {
-        MENU_TO_MATCHER.assertMatch(menuService.getAllEnabled(RESTAURANT_1_ID), menu_1, menu_1_2);
+        MENU_TO_MATCHER.assertMatch(menuService.getAllEnabled(RESTAURANT_1_ID), menu_1, menu_1_2, menu_4);
     }
 }

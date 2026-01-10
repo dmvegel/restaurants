@@ -51,7 +51,6 @@ public class SecurityConfig {
         return new SpringCacheBasedUserCache(cacheManager.getCache("users"));
     }
 
-    //    https://www.phind.com/search/cmihyvg060000356u4nci6bie
     @Bean
     UserDetailsService userDetailsService() {
         CachingUserDetailsService service = new CachingUserDetailsService(email -> {
@@ -69,9 +68,8 @@ public class SecurityConfig {
         builder.eraseCredentials(false);
     }
 
-    //https://stackoverflow.com/a/76538979/548473
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http.securityMatcher("/api/**").authorizeHttpRequests(authz ->
                         authz.requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/api/profile").anonymous()

@@ -53,8 +53,9 @@ class MenuControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MENU_TO_MATCHER.contentJson(
-                        menu_1,
-                        menu_1_2
+                        menu_4,
+                        menu_1_2,
+                        menu_1
                 ));
     }
 
