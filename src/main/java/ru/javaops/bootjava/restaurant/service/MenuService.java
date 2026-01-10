@@ -2,6 +2,8 @@ package ru.javaops.bootjava.restaurant.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.javaops.bootjava.common.error.NotFoundException;
 import ru.javaops.bootjava.common.service.BaseService;
@@ -25,6 +27,7 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
         this.restaurantService = restaurantService;
     }
 
+    @Cacheable("menusByRestaurant")
     public List<MenuTO> getAllEnabled(int restaurantId) {
         List<Menu> menus = repository.findByRestaurantIdOrderByDateDescEnabled(restaurantId);
         return MenuUtil.getListTo(menus);
@@ -35,6 +38,7 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
         return MenuUtil.getListTo(menus);
     }
 
+    @Cacheable("menuByRestaurantAndDate")
     public MenuTO getEnabled(int restaurantId, LocalDate date) {
         return MenuUtil.getTo(getByEnabledRestaurantIdAndDate(restaurantId, date));
     }
@@ -48,12 +52,14 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
                 () -> new NotFoundException(String.format("Menu with restaurantId=%d and date=%s not found", restaurantId, date)));
     }
 
+    @CacheEvict(value = {"menusByRestaurant", "menuByRestaurantAndDate"}, allEntries = true)
     @Transactional
     public MenuTO create(MenuTO menuTo, int restaurantId) {
         Menu menu = MenuUtil.getFromTo(menuTo, restaurantService.getReference(restaurantId));
         return MenuUtil.getTo(repository.save(menu));
     }
 
+    @CacheEvict(value = {"menusByRestaurant", "menuByRestaurantAndDate"}, allEntries = true)
     @Transactional
     public void update(MenuTO menuTo, int restaurantId) {
         Menu saved = getByRestaurantIdAndDate(restaurantId, menuTo.getDate());

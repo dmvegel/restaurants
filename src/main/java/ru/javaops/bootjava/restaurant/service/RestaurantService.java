@@ -1,6 +1,8 @@
 package ru.javaops.bootjava.restaurant.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.javaops.bootjava.common.error.NotFoundException;
 import ru.javaops.bootjava.common.service.BaseService;
@@ -41,6 +43,7 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
                 .map(RestaurantUtil::getAdminTo).toList();
     }
 
+    @Cacheable("restaurantById")
     public RestaurantTO getEnabled(int id) {
         return RestaurantUtil.getTo(repository.getEnabledById(id)
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id))));
@@ -51,6 +54,7 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id))));
     }
 
+    @Cacheable("restaurants")
     public List<RestaurantTO> getAllEnabled() {
         return repository.getAllEnabled().stream().map(RestaurantUtil::getTo).toList();
     }
@@ -60,12 +64,14 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
         return repository.getEnabledWithMenusByDate(actualDate).stream().map(RestaurantUtil::getWithMenuTo).toList();
     }
 
+    @CacheEvict(value = {"restaurantById", "restaurants"}, allEntries = true)
     @Transactional
     public AdminRestaurantTO create(RestaurantTO restaurantTo) {
         Restaurant restaurant = repository.save(new Restaurant(restaurantTo.getName()));
         return RestaurantUtil.getAdminTo(restaurant);
     }
 
+    @CacheEvict(value = {"restaurantById", "restaurants"}, allEntries = true)
     @Transactional
     public Restaurant update(RestaurantTO restaurantTo) {
         Restaurant restaurant = getExisted(restaurantTo.getId());
@@ -73,6 +79,7 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
         return restaurant;
     }
 
+    @CacheEvict(value = {"restaurantById", "restaurants"}, allEntries = true)
     @Transactional
     public void enable(int id, boolean enabled) {
         Restaurant restaurant = getExisted(id);
