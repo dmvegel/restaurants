@@ -9,7 +9,6 @@ import ru.javaops.bootjava.AbstractControllerTest;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javaops.bootjava.restaurant.MenuTestData.MENU_DATE;
-import static ru.javaops.bootjava.restaurant.MenuTestData.MENU_NOT_FOUND_DATE;
 import static ru.javaops.bootjava.restaurant.RestaurantTestData.*;
 import static ru.javaops.bootjava.restaurant.web.RestaurantController.REST_URL;
 import static ru.javaops.bootjava.user.UserTestData.USER_MAIL;
@@ -47,24 +46,6 @@ class RestaurantControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(RESTAURANT_TO_MATCHER.contentJson(restaurant_1, restaurant_2, restaurant_3));
-    }
-
-    @Test
-    @WithUserDetails(USER_MAIL)
-    void getEnabledWithMenu() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL_SLASH + RESTAURANT_1_ID + "/with-menu")
-                .param("date", MENU_DATE.toString()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(RESTAURANT_WITH_MENUS_TO_MATCHER.contentJson(restaurant_1_on_menu1_date));
-    }
-
-    @Test
-    @WithUserDetails(USER_MAIL)
-    void getNotExistWithMenu() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL_SLASH + RESTAURANT_1_ID + "/with-menu")
-                .param("date", MENU_NOT_FOUND_DATE.toString()))
-                .andExpect(status().isNotFound());
     }
 
     @Test

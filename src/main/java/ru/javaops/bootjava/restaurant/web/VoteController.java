@@ -30,16 +30,19 @@ public class VoteController {
 
     @GetMapping("/{date}")
     public List<RestaurantVotesTO> getRestaurantsWithVotes(@PathVariable LocalDate date) {
+        log.info("get all restaurants with votes on date={}", date);
         return voteService.getRestaurantsWithVotes(date);
     }
 
     @GetMapping("{date}/restaurants/{restaurantId}")
     public RestaurantVotesTO get(@PathVariable LocalDate date, @PathVariable int restaurantId) {
+        log.info("get restaurant with votes for restaurantId={} on date={}", restaurantId, date);
         return voteService.getRestaurantWithVotes(restaurantId, date);
     }
 
     @GetMapping("{date}/me")
     public VoteTO getUserVote(@AuthenticationPrincipal AuthUser authUser, @PathVariable LocalDate date) {
+        log.info("get vote for userId={} for date={}", authUser.id(), date);
         return voteService.getByUserIdAndDate(authUser.id(), date);
     }
 }

@@ -26,17 +26,6 @@ class RestaurantServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    void getWithMenuEnabled() {
-        RESTAURANT_WITH_MENUS_TO_MATCHER.assertMatch(
-                restaurantService.getEnabledWithMenu(RESTAURANT_1_ID, MENU_DATE), restaurant_1_on_menu1_date);
-    }
-
-    @Test
-    void getWithMenuDisabled() {
-        validateRootCause(NotFoundException.class, () -> restaurantService.getEnabledWithMenu(DISABLED_RESTAURANT_ID, MENU_DATE));
-    }
-
-    @Test
     void create() {
         AdminRestaurantTO created = restaurantService.create(getNew());
         AdminRestaurantTO adminRestaurantTO = RestaurantUtil.getAdminTo(getNew(), true);

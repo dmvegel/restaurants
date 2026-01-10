@@ -26,12 +26,13 @@ public class AdminMenuController {
 
     @GetMapping("/{date}")
     public MenuTO get(@PathVariable int restaurantId, @PathVariable LocalDate date) {
+        log.info("get restaurantId={} on date={}", restaurantId, date);
         return menuService.get(restaurantId, date);
     }
 
     @GetMapping
     public List<MenuTO> getAll(@PathVariable int restaurantId) {
-        log.info("getAll");
+        log.info("get all menus for restaurantId={}", restaurantId);
         return menuService.getAll(restaurantId);
     }
 

@@ -29,12 +29,13 @@ public class AdminRestaurantController {
 
     @GetMapping("/{id}")
     public AdminRestaurantTO get(@PathVariable int id) {
+        log.info("get with id={}", id);
         return restaurantService.get(id);
     }
 
     @GetMapping
     public List<AdminRestaurantTO> getAll() {
-        log.info("getAll");
+        log.info("get all");
         return restaurantService.getAll();
     }
 

@@ -49,11 +49,6 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id))));
     }
 
-    public RestaurantWithMenuTO getEnabledWithMenu(int id, LocalDate date) {
-        return RestaurantUtil.getWithMenuTo(repository.getEnabledWithMenu(id, date)
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id))));
-    }
-
     @Cacheable("restaurants")
     public List<RestaurantTO> getAllEnabled() {
         return repository.getAllEnabled().stream().map(RestaurantUtil::getTo).toList();

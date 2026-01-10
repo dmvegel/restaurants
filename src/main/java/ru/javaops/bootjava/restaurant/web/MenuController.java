@@ -24,12 +24,13 @@ public class MenuController {
 
     @GetMapping("/{date}")
     public MenuTO getEnabled(@PathVariable int restaurantId, @PathVariable LocalDate date) {
+        log.info("get enabled");
         return menuService.getEnabled(restaurantId, date);
     }
 
     @GetMapping
     public List<MenuTO> getAllEnabled(@PathVariable int restaurantId) {
-        log.info("getAll");
+        log.info("get all menus for enabled restaurant with id={}", restaurantId);
         return menuService.getAllEnabled(restaurantId);
     }
 }
