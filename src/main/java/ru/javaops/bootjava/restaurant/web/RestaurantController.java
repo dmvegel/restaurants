@@ -1,5 +1,6 @@
 package ru.javaops.bootjava.restaurant.web;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -33,7 +34,9 @@ public class RestaurantController {
     }
 
     @GetMapping("/with-menus")
-    public List<RestaurantWithMenuTO> getAllEnabledWithMenu(@RequestParam(required = false) LocalDate date) {
+    public List<RestaurantWithMenuTO> getAllEnabledWithMenu(
+            @Parameter(description = "Defaults to today if not provided")
+            @RequestParam(required = false) LocalDate date) {
         log.info("get all restaurants with menus on date={}", date);
         return restaurantService.getAllEnabledWithMenu(date);
     }
