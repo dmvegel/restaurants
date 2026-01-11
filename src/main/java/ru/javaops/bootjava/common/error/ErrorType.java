@@ -10,7 +10,8 @@ public enum ErrorType {
     NOT_FOUND("Resource not found", HttpStatus.NOT_FOUND),
     AUTH_ERROR("Authorization error", HttpStatus.FORBIDDEN),
     UNAUTHORIZED("Request unauthorized", HttpStatus.UNAUTHORIZED),
-    FORBIDDEN("Request forbidden", HttpStatus.FORBIDDEN);
+    FORBIDDEN("Request forbidden", HttpStatus.FORBIDDEN),
+    CONFLICT("Conflict", HttpStatus.CONFLICT);
 
     ErrorType(String title, HttpStatus status) {
         this.title = title;

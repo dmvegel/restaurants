@@ -1,11 +1,13 @@
 package ru.javaops.bootjava;
 
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import ru.javaops.bootjava.common.util.JsonUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -33,6 +35,30 @@ public class MatcherFactory {
         return usingAssertions(clazz,
                 (a, e) -> assertThat(a).usingRecursiveComparison().ignoringFields(fieldsToIgnore).isEqualTo(e),
                 (a, e) -> assertThat(a).usingRecursiveFieldByFieldElementComparatorIgnoringFields(fieldsToIgnore).isEqualTo(e));
+    }
+
+    public static <T> Matcher<T> usingEqualsComparatorIgnoringOrder(Class<T> clazz) {
+        return usingAssertions(clazz,
+                (a, e) -> assertThat(a).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(e),
+                (a, e) -> assertThat(a).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(e));
+    }
+
+    public static <T> Matcher<T> usingRecursiveComparatorWithBigDecimalIgnoringOrder(Class<T> clazz) {
+        RecursiveComparisonConfiguration config =
+                RecursiveComparisonConfiguration.builder()
+                        .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                        .withIgnoreCollectionOrder(true)
+                        .build();
+
+        return usingAssertions(clazz,
+                (a, e) -> assertThat(a)
+                        .usingRecursiveComparison(config)
+                        .isEqualTo(e),
+
+                (a, e) -> assertThat(a)
+                        .usingRecursiveComparison(config)
+                        .isEqualTo(e)
+        );
     }
 
     public static class Matcher<T> {
