@@ -11,7 +11,17 @@ import ru.javaops.bootjava.user.model.User;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "vote", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date"}, name = "uk_user_id_date")})
+@Table(name = "vote",
+        uniqueConstraints =
+                {@UniqueConstraint(
+                        columnNames = {"user_id", "date"},
+                        name = "uk_user_id_date")},
+        indexes = {
+                @Index(
+                        name = "vote_date_restaurant_idx",
+                        columnList = "date, restaurant_id"
+                )
+        })
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface VoteRepository extends JpaRepository<Vote, Integer> {
-    long countByRestaurantIdAndDate(Integer restaurantId, LocalDate date);
+    long countByDateAndRestaurantId(LocalDate date, Integer restaurantId);
 
     Optional<Vote> findByUserIdAndDate(int userId, LocalDate date);
 

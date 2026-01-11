@@ -57,7 +57,7 @@ public class VoteService extends BaseService<Vote, VoteRepository> {
 
     public RestaurantVotesTO getRestaurantWithVotes(int restaurantId, LocalDate date) {
         RestaurantTO restaurantTo = restaurantService.getEnabled(restaurantId);
-        long votesCount = repository.countByRestaurantIdAndDate(restaurantId, date);
+        long votesCount = repository.countByDateAndRestaurantId(date, restaurantId);
         return new RestaurantVotesTO(
                 restaurantTo.getId(),
                 restaurantTo.getName(),

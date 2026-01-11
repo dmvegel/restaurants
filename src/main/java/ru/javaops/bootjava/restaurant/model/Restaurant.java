@@ -13,7 +13,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "restaurant", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "uk_restaurant_name")})
+@Table(name = "restaurant",
+        uniqueConstraints =
+                {@UniqueConstraint(
+                        columnNames = {"name"},
+                        name = "uk_restaurant_name")})
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
