@@ -2,6 +2,7 @@ package ru.javaops.bootjava.restaurant.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,12 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 @Entity
-@Table(name = "dish")
+@Table(name = "dish",
+        indexes = {
+                @Index(
+                        columnList = "menu_id",
+                        name = "idx_dish_menu_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

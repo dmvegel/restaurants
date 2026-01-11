@@ -39,5 +39,6 @@ public class Menu extends BaseEntity {
     private Restaurant restaurant;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "menu_id", nullable = false)
     private Set<Dish> dishes = new HashSet<>();
 }

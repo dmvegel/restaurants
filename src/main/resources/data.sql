@@ -23,27 +23,16 @@ VALUES ('2026-01-07', 1),
        (CURRENT_DATE, 1),
        (CURRENT_DATE, 2);
 
-INSERT INTO dish (name, fraction_price, currency)
-VALUES ('Pasta Carbonara', 85000, 'RUB'),
-       ('Pizza Margherita', 75000, 'RUB'),
-       ('Juice', 25000, 'RUB'),
-       ('Salmon Sushi', 120000, 'RUB'),
-       ('Tuna Roll', 95000, 'RUB'),
-       ('Cheeseburger', 65000, 'RUB'),
-       ('French Fries', 30000, 'RUB'),
-       ('Dish', 30000, 'RUB'),
-       ('Another Dish', 30000, 'RUB');
-
-INSERT INTO menu_dishes (menu_id, dishes_id)
-VALUES (1, 1),
-       (1, 2),
-       (2, 3),
-       (3, 4),
-       (3, 5),
-       (4, 6),
-       (4, 7),
-       (5, 8),
-       (6, 9);
+INSERT INTO dish (name, fraction_price, currency, menu_id)
+VALUES ('Pasta Carbonara', 85000, 'RUB', 1),
+       ('Pizza Margherita', 75000, 'RUB', 1),
+       ('Juice', 25000, 'RUB', 2),
+       ('Salmon Sushi', 120000, 'RUB', 3),
+       ('Tuna Roll', 95000, 'RUB', 3),
+       ('Cheeseburger', 65000, 'RUB', 4),
+       ('French Fries', 30000, 'RUB', 4),
+       ('Dish', 30000, 'RUB', 5),
+       ('Another Dish', 30000, 'RUB', 6);
 
 INSERT INTO vote (user_id, restaurant_id, vote_date)
 VALUES (1, 1, '2026-01-07'),
