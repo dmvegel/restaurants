@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name = "menu",
         uniqueConstraints =
                 {@UniqueConstraint(
-                        columnNames = {"restaurant_id", "date"},
+                        columnNames = {"restaurant_id", "menu_date"},
                         name = "uk_restaurant_date")})
 @Getter
 @Setter
@@ -29,7 +29,7 @@ public class Menu extends BaseEntity {
         this.dishes.addAll(dishes);
     }
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "menu_date", nullable = false)
     @NotNull
     private LocalDate date;
 

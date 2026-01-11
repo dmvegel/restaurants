@@ -14,12 +14,12 @@ import java.time.LocalDate;
 @Table(name = "vote",
         uniqueConstraints =
                 {@UniqueConstraint(
-                        columnNames = {"user_id", "date"},
+                        columnNames = {"user_id", "vote_date"},
                         name = "uk_user_id_date")},
         indexes = {
                 @Index(
-                        name = "vote_date_restaurant_idx",
-                        columnList = "date, restaurant_id"
+                        columnList = "vote_date, restaurant_id",
+                        name = "vote_date_restaurant_idx"
                 )
         })
 @Getter
@@ -39,7 +39,7 @@ public class Vote extends BaseEntity {
     @NotNull
     private Restaurant restaurant;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "vote_date", nullable = false)
     @NotNull
     private LocalDate date;
 }

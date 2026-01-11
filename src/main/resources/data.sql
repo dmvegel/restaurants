@@ -14,7 +14,7 @@ VALUES ('Italian Bistro', true),
        ('Burger House', true),
        ('Disabled Restaurant', false);
 
-INSERT INTO menu (date, restaurant_id)
+INSERT INTO menu (menu_date, restaurant_id)
 VALUES ('2026-01-07', 1),
        ('2026-01-08', 1),
        ('2026-01-07', 2),
@@ -45,6 +45,6 @@ VALUES (1, 1),
        (5, 8),
        (6, 9);
 
-INSERT INTO vote (user_id, restaurant_id, date)
+INSERT INTO vote (user_id, restaurant_id, vote_date)
 VALUES (1, 1, '2026-01-07'),
        (2, 2, '2026-01-07');
