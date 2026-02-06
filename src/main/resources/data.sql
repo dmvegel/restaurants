@@ -36,4 +36,5 @@ VALUES ('Pasta Carbonara', 85000, 'RUB', 1),
 
 INSERT INTO vote (user_id, restaurant_id, vote_date)
 VALUES (1, 1, '2026-01-07'),
-       (2, 2, '2026-01-07');
+       (2, 2, '2026-01-07'),
+       (1, 1, '2026-01-08');
