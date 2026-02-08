@@ -38,7 +38,7 @@ public class MenuService extends BaseService<Menu, MenuRepository> {
         return MenuUtil.getListTo(menus);
     }
 
-    @Cacheable("menuByRestaurantAndDate")
+    @Cacheable(value = "menuByRestaurantAndDate", key = "{#restaurantId, #date}")
     public MenuTO getEnabled(int restaurantId, LocalDate date) {
         return MenuUtil.getTo(getByEnabledRestaurantIdAndDate(restaurantId, date));
     }
