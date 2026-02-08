@@ -40,10 +40,6 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
         return repository.getReferenceById(id);
     }
 
-    public Restaurant getReferenceEnabled(int id) {
-        return getOrNotFound(() -> repository.getEnabledById(id), String.format(NOT_FOUND_RESTAURANT, id));
-    }
-
     public List<AdminRestaurantTO> getAll() {
         return repository.findAll().stream()
                 .map(RestaurantUtil::getAdminTo).toList();
