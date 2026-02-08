@@ -1,3 +1,4 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/756fc67243bd45c5a789effed4c42961)](https://app.codacy.com/gh/dmvegel/restaurants/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 -------------------------------------------------------------
 - Stack: [JDK 25](http://jdk.java.net/25/), Spring Boot 4.x, Spring 7, SpringDoc OpenApi 3.x, Jackson 3, Lombok, H2, Caffeine Cache 
 - Run: `mvn spring-boot:run` in root directory.
