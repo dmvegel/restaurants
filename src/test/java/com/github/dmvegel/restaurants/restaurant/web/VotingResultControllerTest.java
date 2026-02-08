@@ -6,6 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
+
 import static com.github.dmvegel.restaurants.restaurant.MenuTestData.MENU_DATE;
 import static com.github.dmvegel.restaurants.restaurant.RestaurantTestData.*;
 import static com.github.dmvegel.restaurants.restaurant.web.VotingResultController.REST_URL;
@@ -37,7 +39,7 @@ class VotingResultControllerTest extends AbstractControllerTest {
                 REST_URL_RESTAURANTS_ON_MENU_DATE_SLASH).param("restaurantId", String.valueOf(RESTAURANT_1_ID)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(RESTAURANT_VOTES_TO_MATCHER.contentJson(restaurant_1_with_votes));
+                .andExpect(RESTAURANT_VOTES_TO_MATCHER.contentJson(List.of(restaurant_1_with_votes)));
     }
 
     @Test

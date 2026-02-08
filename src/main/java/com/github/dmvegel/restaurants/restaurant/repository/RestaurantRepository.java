@@ -19,7 +19,4 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Integer>
 
     @Query("SELECT r FROM Restaurant r WHERE r.enabled = true")
     List<Restaurant> getAllEnabled();
-
-    @Query("SELECT r FROM Restaurant r WHERE r.id = :id AND r.enabled = true")
-    Optional<Restaurant> getReferenceEnabled(int id);
 }

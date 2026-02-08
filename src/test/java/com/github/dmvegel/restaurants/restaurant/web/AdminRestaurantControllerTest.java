@@ -1,8 +1,10 @@
 package com.github.dmvegel.restaurants.restaurant.web;
 
 import com.github.dmvegel.restaurants.AbstractControllerTest;
+import com.github.dmvegel.restaurants.common.error.NotFoundException;
 import com.github.dmvegel.restaurants.common.util.JsonUtil;
 import com.github.dmvegel.restaurants.restaurant.RestaurantTestData;
+import com.github.dmvegel.restaurants.restaurant.service.MenuService;
 import com.github.dmvegel.restaurants.restaurant.service.RestaurantService;
 import com.github.dmvegel.restaurants.restaurant.to.AdminRestaurantTO;
 import com.github.dmvegel.restaurants.restaurant.to.RestaurantTO;
@@ -13,10 +15,12 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static com.github.dmvegel.restaurants.restaurant.MenuTestData.MENU_DATE;
 import static com.github.dmvegel.restaurants.restaurant.RestaurantTestData.*;
 import static com.github.dmvegel.restaurants.restaurant.web.AdminRestaurantController.REST_URL;
 import static com.github.dmvegel.restaurants.user.UserTestData.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +29,9 @@ class AdminRestaurantControllerTest extends AbstractControllerTest {
 
     @Autowired
     private RestaurantService restaurantService;
+
+    @Autowired
+    private MenuService menuService;
 
     @Test
     @WithUserDetails(ADMIN_MAIL)
@@ -138,6 +145,7 @@ class AdminRestaurantControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         assertFalse(restaurantService.get(RESTAURANT_1_ID).isEnabled());
+        assertThrows(NotFoundException.class, () -> menuService.getEnabled(RESTAURANT_1_ID, MENU_DATE));
     }
 
     @Test

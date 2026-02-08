@@ -3,7 +3,7 @@ package com.github.dmvegel.restaurants.restaurant.service;
 import com.github.dmvegel.restaurants.common.error.NotFoundException;
 import com.github.dmvegel.restaurants.common.error.VoteTimeExpiredException;
 import com.github.dmvegel.restaurants.common.service.BaseService;
-import com.github.dmvegel.restaurants.common.time.TimeService;
+import com.github.dmvegel.restaurants.common.time.TimeProvider;
 import com.github.dmvegel.restaurants.restaurant.model.Restaurant;
 import com.github.dmvegel.restaurants.restaurant.model.Vote;
 import com.github.dmvegel.restaurants.restaurant.projection.RestaurantVoteProjection;
@@ -14,25 +14,27 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.dmvegel.restaurants.common.time.TimeService.CHANGE_DEADLINE;
+import static com.github.dmvegel.restaurants.common.time.TimeProvider.CHANGE_DEADLINE;
 
 @Service
 public class VoteService extends BaseService<Vote, VoteRepository> {
     private final RestaurantService restaurantService;
     private final MenuService menuService;
-    private final TimeService timeService;
+    private final TimeProvider timeProvider;
 
     public VoteService(VoteRepository repository,
                        RestaurantService restaurantService,
-                       TimeService timeService,
+                       TimeProvider timeProvider,
                        MenuService menuService) {
         super(repository);
         this.restaurantService = restaurantService;
-        this.timeService = timeService;
+        this.timeProvider = timeProvider;
         this.menuService = menuService;
     }
 
@@ -63,8 +65,8 @@ public class VoteService extends BaseService<Vote, VoteRepository> {
     }
 
     public VoteTO getByUserIdAndDate(Integer userId, LocalDate date) {
-        return new VoteTO(repository.findByUserIdAndDate(userId, date).map(vote -> vote.getRestaurant().getId())
-                .orElseThrow(() -> new NotFoundException("Vote didn't exist")));
+        return new VoteTO(getOrNotFound(() -> repository.findByUserIdAndDate(userId, date),
+                "Vote didn't exist").getRestaurant().getId());
     }
 
     public List<VoteHistoryTO> getByUserId(Integer userId) {
@@ -77,27 +79,26 @@ public class VoteService extends BaseService<Vote, VoteRepository> {
 
     @Transactional
     public VoteTO save(User user, int restaurantId) {
-        Restaurant restaurant = restaurantService.getReferenceEnabled(restaurantId);
-        LocalDate today = LocalDate.now();
-
-        MenuTO menu = menuService.getEnabled(restaurantId, today);
+        LocalDateTime now = timeProvider.dateTimeNow();
+        MenuTO menu = menuService.getEnabled(restaurantId, now.toLocalDate());
+        Restaurant restaurant = restaurantService.getReference(restaurantId);
         if (menu.getDishes().isEmpty()) {
             throw new NotFoundException("Cannot vote for restaurant without dishes in menu");
         }
 
-        Vote vote = repository.findByUserIdAndDate(user.getId(), today)
+        Vote vote = repository.findByUserIdAndDate(user.getId(), now.toLocalDate())
                 .map(existing -> {
-                    checkDeadline();
+                    checkDeadline(now.toLocalTime());
                     existing.setRestaurant(restaurant);
                     return existing;
                 })
-                .orElseGet(() -> repository.save(new Vote(user, restaurant, today)));
+                .orElseGet(() -> repository.save(new Vote(user, restaurant, now.toLocalDate())));
 
         return new VoteTO(vote.getRestaurant().getId());
     }
 
-    private void checkDeadline() {
-        if (!timeService.now().isBefore(CHANGE_DEADLINE)) {
+    private void checkDeadline(LocalTime time) {
+        if (!time.isBefore(CHANGE_DEADLINE)) {
             throw new VoteTimeExpiredException("Cannot change vote after " + CHANGE_DEADLINE);
         }
     }

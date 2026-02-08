@@ -3,15 +3,15 @@ package com.github.dmvegel.restaurants.restaurant.service;
 import com.github.dmvegel.restaurants.common.error.NotFoundException;
 import com.github.dmvegel.restaurants.common.error.VoteTimeExpiredException;
 import com.github.dmvegel.restaurants.common.service.AbstractServiceTest;
-import com.github.dmvegel.restaurants.common.time.TimeService;
+import com.github.dmvegel.restaurants.common.time.TimeProvider;
 import com.github.dmvegel.restaurants.restaurant.to.VoteTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import static com.github.dmvegel.restaurants.common.time.TimeService.CHANGE_DEADLINE;
 import static com.github.dmvegel.restaurants.restaurant.RestaurantTestData.*;
 import static com.github.dmvegel.restaurants.restaurant.VoteTestData.*;
 import static com.github.dmvegel.restaurants.user.UserTestData.USER_ID;
@@ -20,14 +20,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 class VoteServiceTest extends AbstractServiceTest {
-    @Autowired
-    VoteService voteService;
+    private static final LocalDateTime BEFORE_DEADLINE =
+            LocalDate.now().atTime(TimeProvider.CHANGE_DEADLINE.minusMinutes(1));
 
-    @MockitoSpyBean
-    private TimeService timeService;
+    private static final LocalDateTime AFTER_DEADLINE =
+            LocalDate.now().atTime(TimeProvider.CHANGE_DEADLINE.plusMinutes(1));
+
+    @Autowired
+    private VoteService voteService;
+
+    @MockitoBean
+    private TimeProvider timeProvider;
 
     @Test
     void voteForEnabled() {
+        when(timeProvider.dateTimeNow()).thenReturn(BEFORE_DEADLINE);
         VoteTO voteTo = voteService.save(user, RESTAURANT_1_ID);
         assertThat(voteService.getByUserIdAndDate(user.getId(), LocalDate.now()))
                 .isEqualTo(voteTo);
@@ -35,12 +42,13 @@ class VoteServiceTest extends AbstractServiceTest {
 
     @Test
     void voteForDisabled() {
+        when(timeProvider.dateTimeNow()).thenReturn(BEFORE_DEADLINE);
         validateRootCause(NotFoundException.class, () -> voteService.save(user, DISABLED_RESTAURANT_ID));
     }
 
     @Test
     void changeVoteBeforeDeadline() {
-        when(timeService.now()).thenReturn(CHANGE_DEADLINE.minusMinutes(1));
+        when(timeProvider.dateTimeNow()).thenReturn(BEFORE_DEADLINE);
         VoteTO saved = voteService.save(user, RESTAURANT_1_ID);
         assertThat(saved.restaurantId()).isEqualTo(RESTAURANT_1_ID);
         VoteTO changed = voteService.save(user, RESTAURANT_1_ID);
@@ -49,7 +57,7 @@ class VoteServiceTest extends AbstractServiceTest {
 
     @Test
     void changeVoteAfterDeadline() {
-        when(timeService.now()).thenReturn(CHANGE_DEADLINE.plusMinutes(1));
+        when(timeProvider.dateTimeNow()).thenReturn(AFTER_DEADLINE);
         VoteTO saved = voteService.save(user, RESTAURANT_1_ID);
         assertThat(saved.restaurantId()).isEqualTo(RESTAURANT_1_ID);
         validateRootCause(VoteTimeExpiredException.class, () -> voteService.save(user, RESTAURANT_1_ID));

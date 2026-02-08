@@ -19,15 +19,13 @@ public class VotingResultController {
     static final String REST_URL = "/api/voting-results";
     private final VoteService voteService;
 
-    @GetMapping("{date}")
-    public List<RestaurantVotesTO> getRestaurantsWithVotes(@PathVariable LocalDate date) {
-        log.info("get all restaurants with votes on date={}", date);
-        return voteService.getRestaurantsWithVotes(date);
-    }
-
-    @GetMapping(value = "{date}", params = "restaurantId")
-    public RestaurantVotesTO get(@PathVariable LocalDate date, @RequestParam int restaurantId) {
+    @GetMapping(value = "{date}")
+    public List<RestaurantVotesTO> get(@PathVariable LocalDate date, @RequestParam(required = false) Integer restaurantId) {
+        if (restaurantId == null) {
+            log.info("get all restaurants with votes on date={}", date);
+            return voteService.getRestaurantsWithVotes(date);
+        }
         log.info("get restaurant with votes for restaurantId={} on date={}", restaurantId, date);
-        return voteService.getRestaurantWithVotes(restaurantId, date);
+        return List.of(voteService.getRestaurantWithVotes(restaurantId, date));
     }
 }

@@ -1,6 +1,7 @@
 package com.github.dmvegel.restaurants.restaurant.web;
 
 import com.github.dmvegel.restaurants.app.config.WebConfig;
+import com.github.dmvegel.restaurants.common.validation.ValidationUtil;
 import com.github.dmvegel.restaurants.restaurant.service.MenuService;
 import com.github.dmvegel.restaurants.restaurant.to.MenuTO;
 import jakarta.validation.Valid;
@@ -40,6 +41,7 @@ public class AdminMenuController {
     public ResponseEntity<MenuTO> create(@Valid @RequestBody MenuTO menuTo,
                                          @PathVariable int restaurantId,
                                          @PathVariable LocalDate date) {
+        ValidationUtil.assureDateConsistent(menuTo, date);
         log.info("create menu {} for restaurantId={}", menuTo, restaurantId);
         MenuTO created = menuService.create(menuTo, restaurantId, date);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -52,6 +54,7 @@ public class AdminMenuController {
     @PutMapping(value = "/{date}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody MenuTO menuTo, @PathVariable int restaurantId, @PathVariable LocalDate date) {
+        ValidationUtil.assureDateConsistent(menuTo, date);
         log.info("update {} with restaurantId={} and date={}", menuTo, restaurantId, date);
         menuService.update(menuTo, restaurantId, date);
     }

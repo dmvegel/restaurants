@@ -13,16 +13,16 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public interface MenuRepository extends JpaRepository<Menu, Integer> {
     @EntityGraph(attributePaths = {"dishes"})
-    @Query("SELECT m FROM Menu m JOIN m.restaurant r " +
-            "WHERE r.id = :restaurantId AND m.date = :date AND r.enabled = true")
+    @Query("SELECT m FROM Menu m " +
+            "WHERE m.restaurant.id = :restaurantId AND m.date = :date AND m.enabled = true")
     Optional<Menu> findByRestaurantIdAndDateEnabled(int restaurantId, LocalDate date);
 
     @EntityGraph(attributePaths = {"dishes"})
     Optional<Menu> findByRestaurantIdAndDate(int restaurantId, LocalDate date);
 
     @EntityGraph(attributePaths = {"dishes"})
-    @Query("SELECT m FROM Menu m JOIN m.restaurant r " +
-            "WHERE r.id = :restaurantId AND r.enabled = true ORDER BY m.date DESC")
+    @Query("SELECT m FROM Menu m " +
+            "WHERE m.restaurant.id = :restaurantId AND m.enabled = true ORDER BY m.date DESC")
     List<Menu> findByRestaurantIdOrderByDateDescEnabled(int restaurantId);
 
     @EntityGraph(attributePaths = {"dishes"})

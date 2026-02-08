@@ -13,7 +13,7 @@ import static com.github.dmvegel.restaurants.restaurant.RestaurantTestData.*;
 
 class RestaurantServiceTest extends AbstractServiceTest {
     @Autowired
-    RestaurantService restaurantService;
+    private RestaurantService restaurantService;
 
     @Test
     void getEnabled() {

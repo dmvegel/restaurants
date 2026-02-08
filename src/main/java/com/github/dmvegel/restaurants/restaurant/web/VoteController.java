@@ -2,6 +2,7 @@ package com.github.dmvegel.restaurants.restaurant.web;
 
 import com.github.dmvegel.restaurants.app.AuthUser;
 import com.github.dmvegel.restaurants.app.config.WebConfig;
+import com.github.dmvegel.restaurants.common.time.TimeProvider;
 import com.github.dmvegel.restaurants.restaurant.service.VoteService;
 import com.github.dmvegel.restaurants.restaurant.to.VoteHistoryTO;
 import com.github.dmvegel.restaurants.restaurant.to.VoteTO;
@@ -25,7 +26,9 @@ import java.util.List;
 @Slf4j
 public class VoteController {
     static final String REST_URL = "/api/votings";
+
     private final VoteService voteService;
+    private final TimeProvider timeProvider;
 
     @PostMapping(value = "/restaurants", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VoteTO> vote(@AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody VoteTO vote) {
@@ -33,7 +36,7 @@ public class VoteController {
         VoteTO created = voteService.save(authUser.getUser(), vote.restaurantId());
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{date}")
-                .buildAndExpand(LocalDate.now()).toUri();
+                .buildAndExpand(timeProvider.dateNow()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 

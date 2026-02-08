@@ -24,7 +24,7 @@ public class MenuController {
 
     @GetMapping("/{date}")
     public MenuTO getEnabled(@PathVariable int restaurantId, @PathVariable LocalDate date) {
-        log.info("get enabled");
+        log.info("get enabled menu for restaurantId={} and date={}", restaurantId, date);
         return menuService.getEnabled(restaurantId, date);
     }
 

@@ -1,8 +1,9 @@
 package com.github.dmvegel.restaurants.restaurant.service;
 
-import com.github.dmvegel.restaurants.common.error.NotFoundException;
 import com.github.dmvegel.restaurants.common.service.BaseService;
+import com.github.dmvegel.restaurants.common.time.TimeProvider;
 import com.github.dmvegel.restaurants.restaurant.model.Restaurant;
+import com.github.dmvegel.restaurants.restaurant.repository.MenuRepository;
 import com.github.dmvegel.restaurants.restaurant.repository.RestaurantRepository;
 import com.github.dmvegel.restaurants.restaurant.to.AdminRestaurantTO;
 import com.github.dmvegel.restaurants.restaurant.to.RestaurantTO;
@@ -11,6 +12,7 @@ import com.github.dmvegel.restaurants.restaurant.util.RestaurantUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,8 +22,13 @@ import java.util.List;
 public class RestaurantService extends BaseService<Restaurant, RestaurantRepository> {
     private static final String NOT_FOUND_RESTAURANT = "Restaurant with id=%d not found";
 
-    public RestaurantService(RestaurantRepository repository) {
+    private final MenuRepository menuRepository;
+    private final TimeProvider timeProvider;
+
+    public RestaurantService(RestaurantRepository repository, MenuRepository menuRepository, TimeProvider timeProvider) {
         super(repository);
+        this.menuRepository = menuRepository;
+        this.timeProvider = timeProvider;
     }
 
     public AdminRestaurantTO get(int id) {
@@ -34,8 +41,7 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
     }
 
     public Restaurant getReferenceEnabled(int id) {
-        return repository.getReferenceEnabled(id)
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id)));
+        return getOrNotFound(() -> repository.getEnabledById(id), String.format(NOT_FOUND_RESTAURANT, id));
     }
 
     public List<AdminRestaurantTO> getAll() {
@@ -45,8 +51,8 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
 
     @Cacheable("restaurantById")
     public RestaurantTO getEnabled(int id) {
-        return RestaurantUtil.getTo(repository.getEnabledById(id)
-                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_RESTAURANT, id))));
+        return RestaurantUtil.getTo(getOrNotFound(() -> repository.getEnabledById(id),
+                String.format(NOT_FOUND_RESTAURANT, id)));
     }
 
     @Cacheable("restaurants")
@@ -55,18 +61,21 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
     }
 
     public List<RestaurantWithMenuTO> getAllEnabledWithMenu(LocalDate date) {
-        LocalDate actualDate = date != null ? date : LocalDate.now();
+        LocalDate actualDate = date != null ? date : timeProvider.dateNow();
         return repository.getEnabledWithMenusByDate(actualDate).stream().map(RestaurantUtil::getWithMenuTo).toList();
     }
 
-    @CacheEvict(value = {"restaurantById", "restaurants"}, allEntries = true)
+    @CacheEvict(value = "restaurants", allEntries = true)
     @Transactional
     public AdminRestaurantTO create(RestaurantTO restaurantTo) {
         Restaurant restaurant = repository.save(new Restaurant(restaurantTo.getName()));
         return RestaurantUtil.getAdminTo(restaurant);
     }
 
-    @CacheEvict(value = {"restaurantById", "restaurants"}, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "restaurants", allEntries = true),
+            @CacheEvict(value = "restaurantById", key = "#restaurantTo.id")
+    })
     @Transactional
     public Restaurant update(RestaurantTO restaurantTo) {
         Restaurant restaurant = getExisted(restaurantTo.getId());
@@ -74,14 +83,25 @@ public class RestaurantService extends BaseService<Restaurant, RestaurantReposit
         return restaurant;
     }
 
-    @CacheEvict(value = {"restaurantById", "restaurants"}, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "restaurants", allEntries = true),
+            @CacheEvict(value = "restaurantById", key = "#id"),
+            @CacheEvict(value = "menusByRestaurant", key = "#id"),
+            @CacheEvict(value = "menuByRestaurantAndDate", allEntries = true)
+    })
     @Transactional
     public void enable(int id, boolean enabled) {
         Restaurant restaurant = getExisted(id);
         restaurant.setEnabled(enabled);
+        menuRepository.findByRestaurantIdOrderByDateDesc(id).forEach(menu -> menu.setEnabled(enabled));
     }
 
-    @CacheEvict(value = {"restaurantById", "restaurants"}, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "restaurants", allEntries = true),
+            @CacheEvict(value = "restaurantById", key = "#id"),
+            @CacheEvict(value = "menusByRestaurant", key = "#id"),
+            @CacheEvict(value = "menuByRestaurantAndDate", allEntries = true)
+    })
     @Transactional
     public void delete(int id) {
         repository.delete(getExisted(id));

@@ -84,7 +84,7 @@ class AdminMenuControllerTest extends AbstractControllerTest {
     void createInvalid() throws Exception {
         perform(MockMvcRequestBuilders.post(REST_URL_SLASH_FOR_ID_1 + NEW_MENU_DATE)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(new MenuTO(null))))
+                .content(JsonUtil.writeValue(new MenuTO(NEW_MENU_DATE, null))))
                 .andExpect(status().isUnprocessableContent());
     }
 

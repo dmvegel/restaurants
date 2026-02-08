@@ -9,12 +9,12 @@ import java.util.List;
 
 public class MenuUtil {
     public static List<MenuTO> getListTo(List<Menu> menus) {
-        return menus.stream().map(menu -> new MenuTO(DishUtil.getListTo(menu.getDishes())))
+        return menus.stream().map(menu -> new MenuTO(menu.getDate(), DishUtil.getListTo(menu.getDishes())))
                 .toList();
     }
 
     public static MenuTO getTo(Menu menu) {
-        return new MenuTO(DishUtil.getListTo(menu.getDishes()));
+        return new MenuTO(menu.getDate(), DishUtil.getListTo(menu.getDishes()));
     }
 
     public static Menu getFromTo(MenuTO menuTo, Restaurant restaurant, LocalDate date) {

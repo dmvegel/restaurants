@@ -40,8 +40,16 @@ public class Menu extends BaseEntity {
     @NotNull
     private Restaurant restaurant;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "menu_id", nullable = false)
     private Set<Dish> dishes = new HashSet<>();
+
+    @Column(name = "enabled", nullable = false, columnDefinition = "bool default true")
+    private boolean enabled = true;
+
+    public void setDishes(Set<Dish> dishes) {
+        this.dishes.clear();
+        this.dishes.addAll(dishes);
+    }
 }
