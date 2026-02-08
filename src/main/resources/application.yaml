@@ -30,9 +30,10 @@ spring:
       enabled: true
       force: true
 
+springdoc.swagger-ui.path: /
+
+logging:
   level:
     root: WARN
-    ru.javaops.restaurants: DEBUG
+    com.github.dmvegel.restaurants: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: DEBUG
-
-springdoc.swagger-ui.path: /
